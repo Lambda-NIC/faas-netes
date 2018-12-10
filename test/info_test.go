@@ -7,8 +7,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/openfaas/faas-netes/handlers"
-	"github.com/openfaas/faas-provider/types"
+	"github.com/Lambda-NIC/faas-netes/handlers"
+	"github.com/Lambda-NIC/faas-provider/types"
 )
 
 const (

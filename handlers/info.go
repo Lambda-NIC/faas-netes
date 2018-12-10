@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/openfaas/faas-provider/types"
+	"github.com/Lambda-NIC/faas-provider/types"
 )
 
 const (

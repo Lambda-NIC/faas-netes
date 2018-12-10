@@ -14,8 +14,10 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"time"
+	"math/rand"
 
-	"github.com/openfaas/faas/gateway/requests"
+	"github.com/Lambda-NIC/faas/gateway/requests"
 	apiv1 "k8s.io/api/core/v1"
 	corev1 "k8s.io/api/core/v1"
 	v1beta1 "k8s.io/api/extensions/v1beta1"
@@ -23,6 +25,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
 	"k8s.io/client-go/kubernetes"
+	"go.etcd.io/etcd/client"
 )
 
 // watchdogPort for the OpenFaaS function watchdog
@@ -45,6 +48,13 @@ func ValidateDeployRequest(request *requests.CreateFunctionRequest) error {
 	return fmt.Errorf("(%s) must be a valid DNS entry for service name", request.Service)
 }
 
+// LambdaNIC: List of SmartNICs to use and how many deployments are there.
+var smartNICs = [4]string{"20.20.20.101", "20.20.20.102",
+													"20.20.20.103", "20.20.20.104"}
+// LambdaNIC: Contains the number of deployments per smartNIC server
+var numDeployments [4]map[string]uint8
+var lambdaNICJobIDs map[string]string
+
 // FunctionProbeConfig specify options for Liveliness and Readiness checks
 type FunctionProbeConfig struct {
 	InitialDelaySeconds int32
@@ -61,7 +71,10 @@ type DeployHandlerConfig struct {
 }
 
 // MakeDeployHandler creates a handler to create new functions in the cluster
-func MakeDeployHandler(functionNamespace string, clientset *kubernetes.Clientset, config *DeployHandlerConfig) http.HandlerFunc {
+func MakeDeployHandler(functionNamespace string,
+											 keysAPI client.KeysAPI,
+											 clientset *kubernetes.Clientset,
+											 config *DeployHandlerConfig) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		defer r.Body.Close()
 
@@ -80,53 +93,74 @@ func MakeDeployHandler(functionNamespace string, clientset *kubernetes.Clientset
 			return
 		}
 
-		existingSecrets, err := getSecrets(clientset, functionNamespace, request.Secrets)
-		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			w.Write([]byte(err.Error()))
-			return
-		}
+		// LambdaNIC: Deployment scheme for lambdaNIC
+		if strings.Contains(request.Service, "lambdaNIC") {
+			// Check if this service already exists
+			if _, ok := lambdaNICJobIDs[request.Service]; ok {
+				w.WriteHeader(http.StatusBadRequest)
+				w.Write([]byte(request.Service + " already exists"))
+				return
+			}
+			// Assign a uid to the job
+			uid := fmt.Sprintf("%d", time.Now().Nanosecond())
+			lambdaNICJobIDs[request.Service] = uid
 
-		deploymentSpec, specErr := makeDeploymentSpec(request, existingSecrets, config)
+			randIdx := rand.Intn(len(smartNICs))
+			numDeployments[randIdx][request.Service] = 1
 
-		if specErr != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			w.Write([]byte(specErr.Error()))
-			return
-		}
+			log.Println("Created SmartNIC service - " + request.Service + " at " +
+									smartNICs[randIdx])
+			log.Println(string(body))
+		} else {
+			existingSecrets, err :=
+				getSecrets(clientset, functionNamespace, request.Secrets)
+			if err != nil {
+				w.WriteHeader(http.StatusBadRequest)
+				w.Write([]byte(err.Error()))
+				return
+			}
 
-		deploy := clientset.Extensions().Deployments(functionNamespace)
+			deploymentSpec, specErr :=
+				makeDeploymentSpec(request, existingSecrets, config)
 
-		_, err = deploy.Create(deploymentSpec)
-		if err != nil {
-			log.Println(err)
-			w.WriteHeader(http.StatusInternalServerError)
-			w.Write([]byte(err.Error()))
-			return
-		}
+			if specErr != nil {
+				w.WriteHeader(http.StatusBadRequest)
+				w.Write([]byte(specErr.Error()))
+				return
+			}
 
-		log.Println("Created deployment - " + request.Service)
+			deploy := clientset.Extensions().Deployments(functionNamespace)
 
-		service := clientset.Core().Services(functionNamespace)
-		serviceSpec := makeServiceSpec(request)
-		_, err = service.Create(serviceSpec)
+			_, err = deploy.Create(deploymentSpec)
+			if err != nil {
+				log.Println(err)
+				w.WriteHeader(http.StatusInternalServerError)
+				w.Write([]byte(err.Error()))
+				return
+			}
 
-		if err != nil {
-			log.Println(err)
-			w.WriteHeader(http.StatusInternalServerError)
-			w.Write([]byte(err.Error()))
-			return
-		}
+			log.Println("Created deployment - " + request.Service)
 
-		log.Println("Created service - " + request.Service)
-		log.Println(string(body))
+			service := clientset.Core().Services(functionNamespace)
+			serviceSpec := makeServiceSpec(request)
+			_, err = service.Create(serviceSpec)
 
+			if err != nil {
+				log.Println(err)
+				w.WriteHeader(http.StatusInternalServerError)
+				w.Write([]byte(err.Error()))
+				return
+			}
+			log.Println("Created service - " + request.Service)
+			log.Println(string(body))
+	  }
 		w.WriteHeader(http.StatusAccepted)
-
 	}
 }
 
-func makeDeploymentSpec(request requests.CreateFunctionRequest, existingSecrets map[string]*apiv1.Secret, config *DeployHandlerConfig) (*v1beta1.Deployment, error) {
+func makeDeploymentSpec(request requests.CreateFunctionRequest,
+		existingSecrets map[string]*apiv1.Secret,
+		config *DeployHandlerConfig) (*v1beta1.Deployment, error) {
 	envVars := buildEnvVars(&request)
 	var handler apiv1.Handler
 

@@ -9,7 +9,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/openfaas/faas/gateway/requests"
+	"github.com/Lambda-NIC/faas/gateway/requests"
 	v1beta1 "k8s.io/api/extensions/v1beta1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -17,7 +17,8 @@ import (
 )
 
 // MakeFunctionReader handler for reading functions deployed in the cluster as deployments.
-func MakeFunctionReader(functionNamespace string, clientset *kubernetes.Clientset) http.HandlerFunc {
+func MakeFunctionReader(functionNamespace string,
+												clientset *kubernetes.Clientset) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
 		functions, err := getServiceList(functionNamespace, clientset)
@@ -35,7 +36,8 @@ func MakeFunctionReader(functionNamespace string, clientset *kubernetes.Clientse
 	}
 }
 
-func getServiceList(functionNamespace string, clientset *kubernetes.Clientset) ([]requests.Function, error) {
+func getServiceList(functionNamespace string,
+		clientset *kubernetes.Clientset) ([]requests.Function, error) {
 	functions := []requests.Function{}
 
 	listOpts := metav1.ListOptions{

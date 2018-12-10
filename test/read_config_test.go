@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/openfaas/faas-netes/types"
+	"github.com/Lambda-NIC/faas-netes/types"
 )
 
 type EnvBucket struct {

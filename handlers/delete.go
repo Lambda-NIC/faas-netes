@@ -7,16 +7,20 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
+	"strings"
+	"log"
 
-	"github.com/openfaas/faas/gateway/requests"
+	"github.com/Lambda-NIC/faas/gateway/requests"
 	v1beta1 "k8s.io/api/extensions/v1beta1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
+	"go.etcd.io/etcd/client"
 )
 
 // MakeDeleteHandler delete a function
-func MakeDeleteHandler(functionNamespace string, clientset *kubernetes.Clientset) http.HandlerFunc {
+func MakeDeleteHandler(functionNamespace string, keysAPI client.KeysAPI,
+											 clientset *kubernetes.Clientset) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		defer r.Body.Close()
 
@@ -33,31 +37,54 @@ func MakeDeleteHandler(functionNamespace string, clientset *kubernetes.Clientset
 			w.WriteHeader(http.StatusBadRequest)
 		}
 
-		getOpts := metav1.GetOptions{}
-
-		// This makes sure we don't delete non-labelled deployments
-		deployment, findDeployErr := clientset.ExtensionsV1beta1().
-			Deployments(functionNamespace).
-			Get(request.FunctionName, getOpts)
-
-		if findDeployErr != nil {
-			if errors.IsNotFound(findDeployErr) {
+		// LambdaNIC: Delete scheme for lambdaNIC
+		if strings.Contains(request.FunctionName, "lambdaNIC") {
+			// Check if this service exists
+			if _, ok := lambdaNICJobIDs[request.FunctionName]; !ok {
 				w.WriteHeader(http.StatusNotFound)
-			} else {
-				w.WriteHeader(http.StatusInternalServerError)
+				w.Write([]byte(request.FunctionName + " not found."))
+				return
 			}
 
-			w.Write([]byte(findDeployErr.Error()))
-			return
-		}
+			for i, smartNIC := range smartNICs {
+				log.Println("Deleted ")
+				if numDep, ok := numDeployments[i][request.FunctionName]; !ok {
+					log.Println("Deleted " + string(numDep) +
+											" deployments in " + smartNIC)
+					delete(numDeployments[i], request.FunctionName)
+				}
+			}
+			delete(lambdaNICJobIDs, request.FunctionName)
 
-		if isFunction(deployment) {
-			deleteFunction(functionNamespace, clientset, request, w)
+			log.Println("Deleted SmartNIC service - " + request.FunctionName)
+			log.Println(string(body))
 		} else {
-			w.WriteHeader(http.StatusBadRequest)
+			getOpts := metav1.GetOptions{}
 
-			w.Write([]byte("Not a function: " + request.FunctionName))
-			return
+			// This makes sure we don't delete non-labelled deployments
+			deployment, findDeployErr := clientset.ExtensionsV1beta1().
+				Deployments(functionNamespace).
+				Get(request.FunctionName, getOpts)
+
+			if findDeployErr != nil {
+				if errors.IsNotFound(findDeployErr) {
+					w.WriteHeader(http.StatusNotFound)
+				} else {
+					w.WriteHeader(http.StatusInternalServerError)
+				}
+
+				w.Write([]byte(findDeployErr.Error()))
+				return
+			}
+
+			if isFunction(deployment) {
+				deleteFunction(functionNamespace, clientset, request, w)
+			} else {
+				w.WriteHeader(http.StatusBadRequest)
+
+				w.Write([]byte("Not a function: " + request.FunctionName))
+				return
+			}
 		}
 
 		w.WriteHeader(http.StatusAccepted)

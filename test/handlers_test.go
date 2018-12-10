@@ -6,8 +6,8 @@ package test
 import (
 	"testing"
 
-	"github.com/openfaas/faas-netes/handlers"
-	"github.com/openfaas/faas/gateway/requests"
+	"github.com/Lambda-NIC/faas-netes/handlers"
+	"github.com/Lambda-NIC/faas/gateway/requests"
 )
 
 func Test_ValidateDeployRequest_ValidCharacters(t *testing.T) {

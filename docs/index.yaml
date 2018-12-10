@@ -19,8 +19,8 @@ entries:
       name: stefanprodan
     name: openfaas
     sources:
-    - https://github.com/openfaas/faas
-    - https://github.com/openfaas/faas-netes
+    - https://github.com/Lambda-NIC/faas
+    - https://github.com/Lambda-NIC/faas-netes
     urls:
     - https://openfaas.github.io/faas-netes/openfaas-1.5.0.tgz
     version: 1.5.0
@@ -42,8 +42,8 @@ entries:
       name: stefanprodan
     name: openfaas
     sources:
-    - https://github.com/openfaas/faas
-    - https://github.com/openfaas/faas-netes
+    - https://github.com/Lambda-NIC/faas
+    - https://github.com/Lambda-NIC/faas-netes
     urls:
     - https://openfaas.github.io/faas-netes/openfaas-1.4.4.tgz
     version: 1.4.4
@@ -65,8 +65,8 @@ entries:
       name: stefanprodan
     name: openfaas
     sources:
-    - https://github.com/openfaas/faas
-    - https://github.com/openfaas/faas-netes
+    - https://github.com/Lambda-NIC/faas
+    - https://github.com/Lambda-NIC/faas-netes
     urls:
     - https://openfaas.github.io/faas-netes/openfaas-1.4.3.tgz
     version: 1.4.3
@@ -88,8 +88,8 @@ entries:
       name: stefanprodan
     name: openfaas
     sources:
-    - https://github.com/openfaas/faas
-    - https://github.com/openfaas/faas-netes
+    - https://github.com/Lambda-NIC/faas
+    - https://github.com/Lambda-NIC/faas-netes
     urls:
     - https://openfaas.github.io/faas-netes/openfaas-1.3.3.tgz
     version: 1.3.3
@@ -111,8 +111,8 @@ entries:
       name: stefanprodan
     name: openfaas
     sources:
-    - https://github.com/openfaas/faas
-    - https://github.com/openfaas/faas-netes
+    - https://github.com/Lambda-NIC/faas
+    - https://github.com/Lambda-NIC/faas-netes
     urls:
     - https://openfaas.github.io/faas-netes/openfaas-1.3.2.tgz
     version: 1.3.2
@@ -134,8 +134,8 @@ entries:
       name: stefanprodan
     name: openfaas
     sources:
-    - https://github.com/openfaas/faas
-    - https://github.com/openfaas/faas-netes
+    - https://github.com/Lambda-NIC/faas
+    - https://github.com/Lambda-NIC/faas-netes
     urls:
     - https://openfaas.github.io/faas-netes/openfaas-1.3.1.tgz
     version: 1.3.1
@@ -157,8 +157,8 @@ entries:
       name: stefanprodan
     name: openfaas
     sources:
-    - https://github.com/openfaas/faas
-    - https://github.com/openfaas/faas-netes
+    - https://github.com/Lambda-NIC/faas
+    - https://github.com/Lambda-NIC/faas-netes
     urls:
     - https://openfaas.github.io/faas-netes/openfaas-1.3.0.tgz
     version: 1.3.0
@@ -180,8 +180,8 @@ entries:
       name: stefanprodan
     name: openfaas
     sources:
-    - https://github.com/openfaas/faas
-    - https://github.com/openfaas/faas-netes
+    - https://github.com/Lambda-NIC/faas
+    - https://github.com/Lambda-NIC/faas-netes
     urls:
     - https://openfaas.github.io/faas-netes/openfaas-1.2.9.tgz
     version: 1.2.9
@@ -203,8 +203,8 @@ entries:
       name: stefanprodan
     name: openfaas
     sources:
-    - https://github.com/openfaas/faas
-    - https://github.com/openfaas/faas-netes
+    - https://github.com/Lambda-NIC/faas
+    - https://github.com/Lambda-NIC/faas-netes
     urls:
     - https://openfaas.github.io/faas-netes/openfaas-1.2.8.tgz
     version: 1.2.8
@@ -226,8 +226,8 @@ entries:
       name: stefanprodan
     name: openfaas
     sources:
-    - https://github.com/openfaas/faas
-    - https://github.com/openfaas/faas-netes
+    - https://github.com/Lambda-NIC/faas
+    - https://github.com/Lambda-NIC/faas-netes
     urls:
     - https://openfaas.github.io/faas-netes/openfaas-1.2.7.tgz
     version: 1.2.7
@@ -249,8 +249,8 @@ entries:
       name: stefanprodan
     name: openfaas
     sources:
-    - https://github.com/openfaas/faas
-    - https://github.com/openfaas/faas-netes
+    - https://github.com/Lambda-NIC/faas
+    - https://github.com/Lambda-NIC/faas-netes
     urls:
     - https://openfaas.github.io/faas-netes/openfaas-1.2.6.tgz
     version: 1.2.6
@@ -272,8 +272,8 @@ entries:
       name: stefanprodan
     name: openfaas
     sources:
-    - https://github.com/openfaas/faas
-    - https://github.com/openfaas/faas-netes
+    - https://github.com/Lambda-NIC/faas
+    - https://github.com/Lambda-NIC/faas-netes
     urls:
     - https://openfaas.github.io/faas-netes/openfaas-1.2.5.tgz
     version: 1.2.5
@@ -295,8 +295,8 @@ entries:
       name: stefanprodan
     name: openfaas
     sources:
-    - https://github.com/openfaas/faas
-    - https://github.com/openfaas/faas-netes
+    - https://github.com/Lambda-NIC/faas
+    - https://github.com/Lambda-NIC/faas-netes
     urls:
     - https://openfaas.github.io/faas-netes/openfaas-1.2.4.tgz
     version: 1.2.4
@@ -318,8 +318,8 @@ entries:
       name: stefanprodan
     name: openfaas
     sources:
-    - https://github.com/openfaas/faas
-    - https://github.com/openfaas/faas-netes
+    - https://github.com/Lambda-NIC/faas
+    - https://github.com/Lambda-NIC/faas-netes
     urls:
     - https://openfaas.github.io/faas-netes/openfaas-1.2.3.tgz
     version: 1.2.3
@@ -341,8 +341,8 @@ entries:
       name: stefanprodan
     name: openfaas
     sources:
-    - https://github.com/openfaas/faas
-    - https://github.com/openfaas/faas-netes
+    - https://github.com/Lambda-NIC/faas
+    - https://github.com/Lambda-NIC/faas-netes
     urls:
     - https://openfaas.github.io/faas-netes/openfaas-1.2.2.tgz
     version: 1.2.2
@@ -364,8 +364,8 @@ entries:
       name: stefanprodan
     name: openfaas
     sources:
-    - https://github.com/openfaas/faas
-    - https://github.com/openfaas/faas-netes
+    - https://github.com/Lambda-NIC/faas
+    - https://github.com/Lambda-NIC/faas-netes
     urls:
     - https://openfaas.github.io/faas-netes/openfaas-1.2.1.tgz
     version: 1.2.1
@@ -387,8 +387,8 @@ entries:
       name: stefanprodan
     name: openfaas
     sources:
-    - https://github.com/openfaas/faas
-    - https://github.com/openfaas/faas-netes
+    - https://github.com/Lambda-NIC/faas
+    - https://github.com/Lambda-NIC/faas-netes
     urls:
     - https://openfaas.github.io/faas-netes/openfaas-1.2.0.tgz
     version: 1.2.0
@@ -410,8 +410,8 @@ entries:
       name: stefanprodan
     name: openfaas
     sources:
-    - https://github.com/openfaas/faas
-    - https://github.com/openfaas/faas-netes
+    - https://github.com/Lambda-NIC/faas
+    - https://github.com/Lambda-NIC/faas-netes
     urls:
     - https://openfaas.github.io/faas-netes/openfaas-1.1.7.tgz
     version: 1.1.7
@@ -433,8 +433,8 @@ entries:
       name: stefanprodan
     name: openfaas
     sources:
-    - https://github.com/openfaas/faas
-    - https://github.com/openfaas/faas-netes
+    - https://github.com/Lambda-NIC/faas
+    - https://github.com/Lambda-NIC/faas-netes
     urls:
     - https://openfaas.github.io/faas-netes/openfaas-1.1.6.tgz
     version: 1.1.6
@@ -456,8 +456,8 @@ entries:
       name: stefanprodan
     name: openfaas
     sources:
-    - https://github.com/openfaas/faas
-    - https://github.com/openfaas/faas-netes
+    - https://github.com/Lambda-NIC/faas
+    - https://github.com/Lambda-NIC/faas-netes
     urls:
     - https://openfaas.github.io/faas-netes/openfaas-1.1.5.tgz
     version: 1.1.5
@@ -479,8 +479,8 @@ entries:
       name: stefanprodan
     name: openfaas
     sources:
-    - https://github.com/openfaas/faas
-    - https://github.com/openfaas/faas-netes
+    - https://github.com/Lambda-NIC/faas
+    - https://github.com/Lambda-NIC/faas-netes
     urls:
     - https://openfaas.github.io/faas-netes/openfaas-1.1.4.tgz
     version: 1.1.4
@@ -502,8 +502,8 @@ entries:
       name: stefanprodan
     name: openfaas
     sources:
-    - https://github.com/openfaas/faas
-    - https://github.com/openfaas/faas-netes
+    - https://github.com/Lambda-NIC/faas
+    - https://github.com/Lambda-NIC/faas-netes
     urls:
     - https://openfaas.github.io/faas-netes/openfaas-1.1.3.tgz
     version: 1.1.3
@@ -525,8 +525,8 @@ entries:
       name: stefanprodan
     name: openfaas
     sources:
-    - https://github.com/openfaas/faas
-    - https://github.com/openfaas/faas-netes
+    - https://github.com/Lambda-NIC/faas
+    - https://github.com/Lambda-NIC/faas-netes
     urls:
     - https://openfaas.github.io/faas-netes/openfaas-1.1.2.tgz
     version: 1.1.2
@@ -548,8 +548,8 @@ entries:
       name: stefanprodan
     name: openfaas
     sources:
-    - https://github.com/openfaas/faas
-    - https://github.com/openfaas/faas-netes
+    - https://github.com/Lambda-NIC/faas
+    - https://github.com/Lambda-NIC/faas-netes
     urls:
     - https://openfaas.github.io/faas-netes/openfaas-1.1.1.tgz
     version: 1.1.1
@@ -571,8 +571,8 @@ entries:
       name: stefanprodan
     name: openfaas
     sources:
-    - https://github.com/openfaas/faas
-    - https://github.com/openfaas/faas-netes
+    - https://github.com/Lambda-NIC/faas
+    - https://github.com/Lambda-NIC/faas-netes
     urls:
     - https://openfaas.github.io/faas-netes/openfaas-1.1.0.tgz
     version: 1.1.0
@@ -592,8 +592,8 @@ entries:
       name: rimusz
     name: openfaas
     sources:
-    - https://github.com/openfaas/faas
-    - https://github.com/openfaas/faas-netes
+    - https://github.com/Lambda-NIC/faas
+    - https://github.com/Lambda-NIC/faas-netes
     urls:
     - https://openfaas.github.io/faas-netes/openfaas-1.0.21.tgz
     version: 1.0.21
@@ -613,8 +613,8 @@ entries:
       name: rimusz
     name: openfaas
     sources:
-    - https://github.com/openfaas/faas
-    - https://github.com/openfaas/faas-netes
+    - https://github.com/Lambda-NIC/faas
+    - https://github.com/Lambda-NIC/faas-netes
     urls:
     - https://openfaas.github.io/faas-netes/openfaas-1.0.20.tgz
     version: 1.0.20
@@ -634,8 +634,8 @@ entries:
       name: rimusz
     name: openfaas
     sources:
-    - https://github.com/openfaas/faas
-    - https://github.com/openfaas/faas-netes
+    - https://github.com/Lambda-NIC/faas
+    - https://github.com/Lambda-NIC/faas-netes
     urls:
     - https://openfaas.github.io/faas-netes/openfaas-1.0.19.tgz
     version: 1.0.19
@@ -655,8 +655,8 @@ entries:
       name: rimusz
     name: openfaas
     sources:
-    - https://github.com/openfaas/faas
-    - https://github.com/openfaas/faas-netes
+    - https://github.com/Lambda-NIC/faas
+    - https://github.com/Lambda-NIC/faas-netes
     urls:
     - https://openfaas.github.io/faas-netes/openfaas-1.0.18.tgz
     version: 1.0.18
@@ -676,8 +676,8 @@ entries:
       name: rimusz
     name: openfaas
     sources:
-    - https://github.com/openfaas/faas
-    - https://github.com/openfaas/faas-netes
+    - https://github.com/Lambda-NIC/faas
+    - https://github.com/Lambda-NIC/faas-netes
     urls:
     - https://openfaas.github.io/faas-netes/openfaas-1.0.17.tgz
     version: 1.0.17
@@ -697,8 +697,8 @@ entries:
       name: rimusz
     name: openfaas
     sources:
-    - https://github.com/openfaas/faas
-    - https://github.com/openfaas/faas-netes
+    - https://github.com/Lambda-NIC/faas
+    - https://github.com/Lambda-NIC/faas-netes
     urls:
     - https://openfaas.github.io/faas-netes/openfaas-1.0.16.tgz
     version: 1.0.16
@@ -718,8 +718,8 @@ entries:
       name: rimusz
     name: openfaas
     sources:
-    - https://github.com/openfaas/faas
-    - https://github.com/openfaas/faas-netes
+    - https://github.com/Lambda-NIC/faas
+    - https://github.com/Lambda-NIC/faas-netes
     urls:
     - https://openfaas.github.io/faas-netes/openfaas-1.0.15.tgz
     version: 1.0.15
@@ -739,8 +739,8 @@ entries:
       name: rimusz
     name: openfaas
     sources:
-    - https://github.com/openfaas/faas
-    - https://github.com/openfaas/faas-netes
+    - https://github.com/Lambda-NIC/faas
+    - https://github.com/Lambda-NIC/faas-netes
     urls:
     - https://openfaas.github.io/faas-netes/openfaas-1.0.14.tgz
     version: 1.0.14

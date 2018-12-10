@@ -4,11 +4,7 @@
   version = "1.6.1"
 
 [[constraint]]
-  name = "github.com/openfaas/faas"
-  version = "0.8.8"
-
-[[constraint]]
-  name = "github.com/openfaas/faas-provider"
+  name = "github.com/Lambda-NIC/faas-provider"
   version = "0.6.0"
 
 [[constraint]]
@@ -22,3 +18,15 @@
 [prune]
   go-tests = true
   unused-packages = true
+
+[[constraint]]
+  name = "go.etcd.io/etcd"
+  version = "3.3.10"
+
+[[constraint]]
+  name = "github.com/Lambda-NIC/faas-netes"
+  version = "0.6.4"
+
+[[constraint]]
+  name = "github.com/Lambda-NIC/faas"
+  version = "0.9.11"

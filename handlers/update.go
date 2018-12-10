@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/openfaas/faas/gateway/requests"
+	"github.com/Lambda-NIC/faas/gateway/requests"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 )

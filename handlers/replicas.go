@@ -10,13 +10,15 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"github.com/openfaas/faas-netes/types"
+	"github.com/Lambda-NIC/faas-netes/types"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
+	"go.etcd.io/etcd/client"
 )
 
 // MakeReplicaUpdater updates desired count of replicas
-func MakeReplicaUpdater(functionNamespace string, clientset *kubernetes.Clientset) http.HandlerFunc {
+func MakeReplicaUpdater(functionNamespace string, keysAPI client.KeysAPI,
+											  clientset *kubernetes.Clientset) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		log.Println("Update replicas")
 

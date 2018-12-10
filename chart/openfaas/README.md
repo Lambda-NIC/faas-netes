@@ -2,14 +2,14 @@
 
 ![OpenFaaS Logo](https://blog.alexellis.io/content/images/2017/08/faas_side.png)
 
-[OpenFaaS](https://github.com/openfaas/faas) (Functions as a Service) is a framework for building serverless functions with Docker and Kubernetes which has first class support for metrics. Any process can be packaged as a function enabling you to consume a range of web events without repetitive boiler-plate coding.
+[OpenFaaS](https://github.com/Lambda-NIC/faas) (Functions as a Service) is a framework for building serverless functions with Docker and Kubernetes which has first class support for metrics. Any process can be packaged as a function enabling you to consume a range of web events without repetitive boiler-plate coding.
 
 **Highlights**
 
 * Ease of use through UI portal and *one-click* install
 * Write functions in any language for Linux or Windows and package in Docker/OCI image format
-* Portable - runs on existing hardware or public/private cloud - [Kubernetes](https://github.com/openfaas/faas-netes) and Docker Swarm native
-* [CLI](http://github.com/openfaas/faas-cli) available with YAML format for templating and defining functions
+* Portable - runs on existing hardware or public/private cloud - [Kubernetes](https://github.com/Lambda-NIC/faas-netes) and Docker Swarm native
+* [CLI](http://github.com/Lambda-NIC/faas-cli) available with YAML format for templating and defining functions
 * Auto-scales as demand increases
 * Scales to zero and back again
 * Compatible with [Istio Service Mesh](https://istio.io). mTLS supported via `exec` health checks.
@@ -85,7 +85,7 @@ echo -n $PASSWORD | faas-cli login -g http://$OPENFAAS_URL -u admin --password-s
 
 ## OpenFaaS Operator / CRD controller
 
-If you would like to work with CRDs there is an alternative controller to faas-netes named [OpenFaaS Operator](https://github.com/openfaas-incubator/openfaas-operator) which can be swapped in at deployment time.
+If you would like to work with CRDs there is an alternative controller to faas-netes named [OpenFaaS Operator](https://github.com/Lambda-NIC-incubator/openfaas-operator) which can be swapped in at deployment time.
 The OpenFaaS Operator is suitable for development and testing and may replace the faas-netes controller in the future.
 The Operator is compatible with Kubernetes 1.9 or later.
 
@@ -100,7 +100,7 @@ This option is good for those that have issues with installing Tiller, the serve
 
 1. Clone the faas-netes repository
     ```sh
-    $ git clone https://github.com/openfaas/faas-netes.git
+    $ git clone https://github.com/Lambda-NIC/faas-netes.git
     ```
 
 2. Render the chart to a Kubernetes manifest called `openfaas.yaml`

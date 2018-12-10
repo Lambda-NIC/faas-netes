@@ -6,15 +6,38 @@ package main
 import (
 	"log"
 	"os"
+	"time"
+	"fmt"
 
-	"github.com/openfaas/faas-netes/handlers"
-	"github.com/openfaas/faas-netes/types"
-	"github.com/openfaas/faas-netes/version"
-	"github.com/openfaas/faas-provider"
-	bootTypes "github.com/openfaas/faas-provider/types"
+	"github.com/Lambda-NIC/faas-netes/handlers"
+	"github.com/Lambda-NIC/faas-netes/types"
+	"github.com/Lambda-NIC/faas-netes/version"
+	"github.com/Lambda-NIC/faas-provider"
+	bootTypes "github.com/Lambda-NIC/faas-provider/types"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
+	"go.etcd.io/etcd/client"
 )
+
+// LambdaNIC: Create etcd connection for saving distributed values.
+const etcdMasterIP string = "30.30.30.105"
+const etcdPort string = "2379"
+
+func createEtcdClient() client.KeysAPI {
+	cfg := client.Config{
+		Endpoints: []string{fmt.Sprintf("http://%s:%s", etcdMasterIP, etcdPort)},
+		Transport: client.DefaultTransport,
+		// set timeout per request to fail fast when
+		// the target endpoint is unavailable
+		HeaderTimeoutPerRequest: time.Second,
+	}
+	c, err := client.New(cfg)
+	if err != nil {
+		log.Fatal(err)
+	}
+	kapi := client.NewKeysAPI(c)
+	return kapi
+}
 
 func main() {
 	// creates the in-cluster config
@@ -38,6 +61,7 @@ func main() {
 	readConfig := types.ReadConfig{}
 	osEnv := types.OsEnv{}
 	cfg := readConfig.Read(osEnv)
+	keysAPI := createEtcdClient()
 
 	log.Printf("HTTP Read Timeout: %s\n", cfg.ReadTimeout)
 	log.Printf("HTTP Write Timeout: %s\n", cfg.WriteTimeout)
@@ -58,9 +82,9 @@ func main() {
 	}
 
 	bootstrapHandlers := bootTypes.FaaSHandlers{
-		FunctionProxy:  handlers.MakeProxy(functionNamespace, cfg.ReadTimeout),
-		DeleteHandler:  handlers.MakeDeleteHandler(functionNamespace, clientset),
-		DeployHandler:  handlers.MakeDeployHandler(functionNamespace, clientset, deployConfig),
+		FunctionProxy:  handlers.MakeProxy(functionNamespace, keysAPI, cfg.ReadTimeout),
+		DeleteHandler:  handlers.MakeDeleteHandler(functionNamespace, keysAPI, clientset),
+		DeployHandler:  handlers.MakeDeployHandler(functionNamespace, keysAPI, clientset, deployConfig),
 		FunctionReader: handlers.MakeFunctionReader(functionNamespace, clientset),
 		ReplicaReader:  handlers.MakeReplicaReader(functionNamespace, clientset),
 		ReplicaUpdater: handlers.MakeReplicaUpdater(functionNamespace, clientset),

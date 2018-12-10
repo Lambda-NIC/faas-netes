@@ -1,17 +1,17 @@
 faas-netes
 ===========
 
-[![Go Report Card](https://goreportcard.com/badge/github.com/openfaas/faas-netes)](https://goreportcard.com/report/github.com/openfaas/faas-netes) [![Build Status](https://travis-ci.org/openfaas/faas-netes.svg?branch=master)](https://travis-ci.org/openfaas/faas-netes)
+[![Go Report Card](https://goreportcard.com/badge/github.com/Lambda-NIC/faas-netes)](https://goreportcard.com/report/github.com/Lambda-NIC/faas-netes) [![Build Status](https://travis-ci.org/openfaas/faas-netes.svg?branch=master)](https://travis-ci.org/openfaas/faas-netes)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![OpenFaaS](https://img.shields.io/badge/openfaas-serverless-blue.svg)](https://www.openfaas.com)
 
-`faas-netes` is an OpenFaaS provider which enables Kubernetes for [OpenFaaS](https://github.com/openfaas/faas). The existing REST API, CLI and UI are fully compatible.
+`faas-netes` is an OpenFaaS provider which enables Kubernetes for [OpenFaaS](https://github.com/Lambda-NIC/faas). The existing REST API, CLI and UI are fully compatible.
 
 > OpenFaaS also runs well on managed Kubernetes services like AKS, EKS and GKE. See our list of tutorials in the documentation site for more.
 
 **Watch a video demo from [TechFieldDay Extra at Dockercon](https://www.youtube.com/watch?v=C3agSKv2s_w&list=PLlIapFDp305AiwA17mUNtgi5-u23eHm5j&index=1)**
 
-[OpenFaaS (Functions as a Service)](https://github.com/openfaas/faas) is a framework for building serverless functions with Docker and Kubernetes which has first class support for metrics. Any process can be packaged as a function enabling you to consume a range of web events without repetitive boiler-plate coding.
+[OpenFaaS (Functions as a Service)](https://github.com/Lambda-NIC/faas) is a framework for building serverless functions with Docker and Kubernetes which has first class support for metrics. Any process can be packaged as a function enabling you to consume a range of web events without repetitive boiler-plate coding.
 
 ![Stack](https://camo.githubusercontent.com/08bc7c0c4f882ef5eadaed797388b27b1a3ca056/68747470733a2f2f7062732e7477696d672e636f6d2f6d656469612f4446726b46344e586f41414a774e322e6a7067)
 
@@ -23,7 +23,7 @@ In this README you'll find a technical overview and instructions for deploying t
 * YAML templates & helm chart
 * Over 13.5k GitHub stars
 * Independent open-source project with over 130 contributors
-* Operator available to use Custom Resource Definitions (CRDs) [openfaas-operator](https://github.com/openfaas-incubator/openfaas-operator/)
+* Operator available to use Custom Resource Definitions (CRDs) [openfaas-operator](https://github.com/Lambda-NIC-incubator/openfaas-operator/)
 
 ## Get started
 

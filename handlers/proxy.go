@@ -14,11 +14,13 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
-	"github.com/openfaas/faas/gateway/requests"
+	"github.com/Lambda-NIC/faas/gateway/requests"
+	"go.etcd.io/etcd/client"
 )
 
 // MakeProxy creates a proxy for HTTP web requests which can be routed to a function.
-func MakeProxy(functionNamespace string, timeout time.Duration) http.HandlerFunc {
+func MakeProxy(functionNamespace string, keysAPI client.KeysAPI,
+							 timeout time.Duration) http.HandlerFunc {
 	proxyClient := http.Client{
 		Transport: &http.Transport{
 			Proxy: http.ProxyFromEnvironment,
