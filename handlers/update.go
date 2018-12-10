@@ -11,10 +11,13 @@ import (
 	"github.com/Lambda-NIC/faas/gateway/requests"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
+	"go.etcd.io/etcd/client"
 )
 
 // MakeUpdateHandler update specified function
-func MakeUpdateHandler(functionNamespace string, clientset *kubernetes.Clientset) http.HandlerFunc {
+func MakeUpdateHandler(functionNamespace string,
+											 keysAPI client.KeysAPI,
+											 clientset *kubernetes.Clientset) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
 		defer r.Body.Close()

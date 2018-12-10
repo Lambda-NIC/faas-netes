@@ -14,10 +14,12 @@ import (
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
+	"go.etcd.io/etcd/client"
 )
 
 // MakeFunctionReader handler for reading functions deployed in the cluster as deployments.
 func MakeFunctionReader(functionNamespace string,
+												keysAPI client.KeysAPI,
 												clientset *kubernetes.Clientset) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
