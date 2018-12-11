@@ -30,7 +30,7 @@ var smartNICs = []string{"20.20.20.101", "20.20.20.102",
 
 func createEtcdClient() client.KeysAPI {
 	cfg := client.Config{
-		Endpoints: []string{fmt.Sprintf("https://%s:%s", etcdMasterIP, etcdPort)},
+		Endpoints: []string{fmt.Sprintf("http://%s:%s", etcdMasterIP, etcdPort)},
 		Transport: client.DefaultTransport,
 		// set timeout per request to fail fast when
 		// the target endpoint is unavailable
@@ -73,7 +73,19 @@ func main() {
 		"/smartnics",
 		"", &opts)
 	if err != nil {
-		log.Fatal(err)
+		log.Println("SmartNIC directory already exists, cleaning...")
+		delopts := client.DeleteOptions{Recursive: true}
+		_, err = keysAPI.Delete(context.Background(), "/smartnics", &delopts)
+		if err != nil {
+			log.Fatal("Error in cleaning smartnic.")
+		}
+		log.Printf("Deleted smartnic, recreating")
+		_, err = keysAPI.Set(context.Background(),
+			"/smartnics",
+			"", &opts)
+		if err != nil {
+			log.Fatal("Could not recreate smartNIC")
+		}
 	} else {
 		// print common key info
 		log.Printf("Added SmartNIC directory to ETCD. Metadata is %q\n",
@@ -83,7 +95,19 @@ func main() {
 		"/deployments",
 		"", &opts)
 	if err != nil {
-		log.Fatal(err)
+		log.Println("Deployments directory already exists, cleaning...")
+		delopts := client.DeleteOptions{Recursive: true}
+		_, err = keysAPI.Delete(context.Background(), "/deployments", &delopts)
+		if err != nil {
+			log.Fatal("Error in cleaning deployments.")
+		}
+		log.Printf("Deleted deployments, recreating")
+		_, err = keysAPI.Set(context.Background(),
+			"/deployments",
+			"", &opts)
+		if err != nil {
+			log.Fatal("Could not recreate deployments")
+		}
 	} else {
 		// print common key info
 		log.Printf("Added Deployments directory to ETCD. Metadata is %q\n",
@@ -93,7 +117,19 @@ func main() {
 		"/functions",
 		"", &opts)
 	if err != nil {
-		log.Fatal(err)
+		log.Println("Functions directory already exists, cleaning...")
+		delopts := client.DeleteOptions{Recursive: true}
+		_, err = keysAPI.Delete(context.Background(), "/functions", &delopts)
+		if err != nil {
+			log.Fatal("Error in cleaning functions.")
+		}
+		log.Printf("Deleted functions, recreating")
+		_, err = keysAPI.Set(context.Background(),
+			"/functions",
+			"", &opts)
+		if err != nil {
+			log.Fatal("Could not recreate functions")
+		}
 	} else {
 		// print common key info
 		log.Printf("Added Functions directory to ETCD. Metadata is %q\n",
@@ -112,7 +148,7 @@ func main() {
 				smartNIC, resp)
 		}
 		resp, err = keysAPI.Set(context.Background(),
-			"/deployments/smartnic%d",
+			fmt.Sprintf("/deployments/smartnic%d", i),
 			"", &opts)
 		if err != nil {
 			log.Fatal(err)
