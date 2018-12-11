@@ -5,7 +5,7 @@
 
 [[constraint]]
   name = "github.com/Lambda-NIC/faas-provider"
-  version = "0.6.0"
+  revision = "0f135d552e5df242cbbef5d980fcd8a498ba4833"
 
 [[constraint]]
   name = "k8s.io/apimachinery"
@@ -25,7 +25,7 @@
 
 [[constraint]]
   name = "github.com/Lambda-NIC/faas-netes"
-  version = "0.6.4"
+  revision = "e4836b6f9e4876389af48c32688395ca222d8571"
 
 [[constraint]]
   name = "github.com/Lambda-NIC/faas"

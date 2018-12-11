@@ -10,7 +10,7 @@
   version = "0.9.11"
 
 [[projects]]
-  digest = "1:78647a594e25a48892095a19aa7b443daccf25660cb4a6d514ee26e38558a4f9"
+  digest = "1:dfd47f4ab529d0d856cfc12ff935e7e29b5aabca83a284ab6ac9e6acbb0208f0"
   name = "github.com/Lambda-NIC/faas-netes"
   packages = [
     "handlers",
@@ -18,8 +18,7 @@
     "version",
   ]
   pruneopts = "UT"
-  revision = "7749ba1ae50cf12dd91f298153c79b9ca7a1d26c"
-  version = "0.6.4"
+  revision = "e4836b6f9e4876389af48c32688395ca222d8571"
 
 [[projects]]
   digest = "1:bea682b0fa01d19595a264f18e7bbbed8949eeaf7d5c640c3f7b49df623f79c5"
@@ -259,6 +258,14 @@
   pruneopts = "UT"
   revision = "4b7aa43c6742a2c18fdef89dd197aaae7dac7ccd"
   version = "1.0.1"
+
+[[projects]]
+  digest = "1:856bc61da6784c3cf562f4f269c33555c5ecd7684e37c124c9fb7d0510ed6305"
+  name = "github.com/openfaas/faas-provider"
+  packages = ["types"]
+  pruneopts = "UT"
+  revision = "8b3147b013c651d5f017b31fa1225ae21e1dc93d"
+  version = "0.8.0"
 
 [[projects]]
   branch = "master"
