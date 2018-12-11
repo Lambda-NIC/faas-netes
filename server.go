@@ -30,7 +30,7 @@ var smartNICs = []string{"20.20.20.101", "20.20.20.102",
 
 func createEtcdClient() client.KeysAPI {
 	cfg := client.Config{
-		Endpoints: []string{fmt.Sprintf("http://%s:%s", etcdMasterIP, etcdPort)},
+		Endpoints: []string{fmt.Sprintf("https://%s:%s", etcdMasterIP, etcdPort)},
 		Transport: client.DefaultTransport,
 		// set timeout per request to fail fast when
 		// the target endpoint is unavailable
