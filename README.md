@@ -1,7 +1,6 @@
 faas-netes
 ===========
 
-[![Go Report Card](https://goreportcard.com/badge/github.com/Lambda-NIC/faas-netes)](https://goreportcard.com/report/github.com/Lambda-NIC/faas-netes) [![Build Status](https://travis-ci.org/openfaas/faas-netes.svg?branch=master)](https://travis-ci.org/openfaas/faas-netes)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![OpenFaaS](https://img.shields.io/badge/openfaas-serverless-blue.svg)](https://www.openfaas.com)
 

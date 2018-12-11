@@ -25,7 +25,7 @@
 We recommend creating two namespaces, one for the OpenFaaS core services and one for the functions:
 
 ```
-$ kubectl apply -f https://raw.githubusercontent.com/openfaas/faas-netes/master/namespaces.yml
+$ kubectl apply -f https://raw.githubusercontent.com/Lambda-NIC/faas-netes/master/namespaces.yml
 ```
 
 You will now have `openfaas` and `openfaas-fn`. If you want to change the names or to install into multiple installations then edit `namespaces.yml` from the `faas-netes` repo.

@@ -25,9 +25,3 @@ charts:
 	cd chart && helm package openfaas/
 	mv chart/*.tgz docs/
 	helm repo index docs --url https://openfaas.github.io/faas-netes/ --merge ./docs/index.yaml
-
-ci-armhf-build:
-	docker build -t openfaas/faas-netes:$(TAG)-armhf . -f Dockerfile.armhf
-
-ci-armhf-push:
-	docker push openfaas/faas-netes:$(TAG)-armhf
