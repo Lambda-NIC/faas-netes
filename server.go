@@ -4,29 +4,29 @@
 package main
 
 import (
+	"context"
+	"fmt"
 	"log"
 	"os"
 	"time"
-	"fmt"
-	"context"
 
 	"github.com/Lambda-NIC/faas-netes/handlers"
 	"github.com/Lambda-NIC/faas-netes/types"
 	"github.com/Lambda-NIC/faas-netes/version"
 	"github.com/Lambda-NIC/faas-provider"
 	bootTypes "github.com/Lambda-NIC/faas-provider/types"
+	"go.etcd.io/etcd/client"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
-	"go.etcd.io/etcd/client"
 )
 
 // LambdaNIC: Create etcd connection for saving distributed values.
-const etcdMasterIP string = "30.30.30.105"
+const etcdMasterIP string = "127.0.0.1"
 const etcdPort string = "2379"
 
 // LambdaNIC: List of SmartNICs to use and how many deployments are there.
 var smartNICs = []string{"20.20.20.101", "20.20.20.102",
-												 "20.20.20.103", "20.20.20.104"}
+	"20.20.20.103", "20.20.20.104"}
 
 func createEtcdClient() client.KeysAPI {
 	cfg := client.Config{
@@ -38,7 +38,7 @@ func createEtcdClient() client.KeysAPI {
 	}
 	c, err := client.New(cfg)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("Could not connect to ETCD: " + err.Error())
 	}
 	kapi := client.NewKeysAPI(c)
 	return kapi
@@ -70,61 +70,61 @@ func main() {
 
 	opts := client.SetOptions{Dir: true}
 	resp, err := keysAPI.Set(context.Background(),
-																	 "/smartnics",
-																	 "", &opts)
+		"/smartnics",
+		"", &opts)
 	if err != nil {
 		log.Fatal(err)
 	} else {
 		// print common key info
 		log.Printf("Added SmartNIC directory to ETCD. Metadata is %q\n",
-							 resp)
+			resp)
 	}
 	resp, err = keysAPI.Set(context.Background(),
-													"/deployments",
-													"", &opts)
+		"/deployments",
+		"", &opts)
 	if err != nil {
 		log.Fatal(err)
 	} else {
 		// print common key info
 		log.Printf("Added Deployments directory to ETCD. Metadata is %q\n",
-							 resp)
+			resp)
 	}
 	resp, err = keysAPI.Set(context.Background(),
-													"/functions",
-													"", &opts)
+		"/functions",
+		"", &opts)
 	if err != nil {
 		log.Fatal(err)
 	} else {
 		// print common key info
 		log.Printf("Added Functions directory to ETCD. Metadata is %q\n",
-							 resp)
+			resp)
 	}
 
 	for i, smartNIC := range smartNICs {
 		resp, err = keysAPI.Set(context.Background(),
-									 				 fmt.Sprintf("/smartnics/%d", i),
-									 			 	 smartNIC, nil)
+			fmt.Sprintf("/smartnics/%d", i),
+			smartNIC, nil)
 		if err != nil {
 			log.Fatal(err)
 		} else {
 			// print common key info
 			log.Printf("Added SmartNIC Server: %s to ETCD. Metadata is %q\n",
-								 smartNIC, resp)
+				smartNIC, resp)
 		}
 		resp, err = keysAPI.Set(context.Background(),
-														"/deployments/smartnic%d",
-														"", &opts)
+			"/deployments/smartnic%d",
+			"", &opts)
 		if err != nil {
 			log.Fatal(err)
 		} else {
 			// print common key info
-			log.Printf("Added SmartNIC %d Deployments directory to ETCD." +
-								 "Metadata is %q\n",
-								 i, resp)
+			log.Printf("Added SmartNIC %d Deployments directory to ETCD."+
+				"Metadata is %q\n",
+				i, resp)
 		}
 	}
-	_, err = keysAPI.Set(context.Background(),"numServers",
-											 string(len(smartNICs)), nil)
+	_, err = keysAPI.Set(context.Background(), "numServers",
+		string(len(smartNICs)), nil)
 	if err != nil {
 		log.Fatal(err)
 	} else {
@@ -150,33 +150,33 @@ func main() {
 	}
 
 	bootstrapHandlers := bootTypes.FaaSHandlers{
-		FunctionProxy:  handlers.MakeProxy(functionNamespace,
-																			 keysAPI,
-																			 cfg.ReadTimeout),
-		DeleteHandler:  handlers.MakeDeleteHandler(functionNamespace,
-																							 keysAPI,
-																							 &smartNICs,
-																							 clientset),
-		DeployHandler:  handlers.MakeDeployHandler(functionNamespace,
-																							 keysAPI,
-																							 &smartNICs,
-																							 clientset,
-																							 deployConfig),
+		FunctionProxy: handlers.MakeProxy(functionNamespace,
+			keysAPI,
+			cfg.ReadTimeout),
+		DeleteHandler: handlers.MakeDeleteHandler(functionNamespace,
+			keysAPI,
+			&smartNICs,
+			clientset),
+		DeployHandler: handlers.MakeDeployHandler(functionNamespace,
+			keysAPI,
+			&smartNICs,
+			clientset,
+			deployConfig),
 		FunctionReader: handlers.MakeFunctionReader(functionNamespace,
-																								keysAPI,
-																								clientset),
-		ReplicaReader:  handlers.MakeReplicaReader(functionNamespace,
-																							 keysAPI,
-																							 clientset),
+			keysAPI,
+			clientset),
+		ReplicaReader: handlers.MakeReplicaReader(functionNamespace,
+			keysAPI,
+			clientset),
 		ReplicaUpdater: handlers.MakeReplicaUpdater(functionNamespace,
-																								keysAPI,
-																							  clientset),
-		UpdateHandler:  handlers.MakeUpdateHandler(functionNamespace,
-																							 keysAPI,
-																							 clientset),
-		Health:         handlers.MakeHealthHandler(),
-		InfoHandler:    handlers.MakeInfoHandler(version.BuildVersion(),
-																						 version.GitCommit),
+			keysAPI,
+			clientset),
+		UpdateHandler: handlers.MakeUpdateHandler(functionNamespace,
+			keysAPI,
+			clientset),
+		Health: handlers.MakeHealthHandler(),
+		InfoHandler: handlers.MakeInfoHandler(version.BuildVersion(),
+			version.GitCommit),
 	}
 
 	var port int
