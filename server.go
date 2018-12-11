@@ -101,7 +101,9 @@ func main() {
 		ReplicaUpdater: handlers.MakeReplicaUpdater(functionNamespace,
 																								keysAPI,
 																							  clientset),
-		UpdateHandler:  handlers.MakeUpdateHandler(functionNamespace, clientset),
+		UpdateHandler:  handlers.MakeUpdateHandler(functionNamespace,
+																							 keysAPI,
+																							 clientset),
 		Health:         handlers.MakeHealthHandler(),
 		InfoHandler:    handlers.MakeInfoHandler(version.BuildVersion(), version.GitCommit),
 	}

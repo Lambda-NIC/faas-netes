@@ -18,18 +18,18 @@
     "version",
   ]
   pruneopts = "UT"
-  revision = "e4836b6f9e4876389af48c32688395ca222d8571"
+  revision = "1a52df4a66d48683ac25b151aa533f6ea87d85a4"
 
 [[projects]]
-  digest = "1:bea682b0fa01d19595a264f18e7bbbed8949eeaf7d5c640c3f7b49df623f79c5"
+  digest = "1:c516cbdb9db9edf40602242ccf8baea3762660a114bcf23889f0d0242fc9c0a6"
   name = "github.com/Lambda-NIC/faas-provider"
   packages = [
     ".",
+    "auth",
     "types",
   ]
   pruneopts = "UT"
-  revision = "ffce01238ccf01b0f4e573fb65b92b285a547a4b"
-  version = "0.6"
+  revision = "0f135d552e5df242cbbef5d980fcd8a498ba4833"
 
 [[projects]]
   digest = "1:d1665c44bd5db19aaee18d1b6233c99b0b9a986e8bccb24ef54747547a48027f"
@@ -258,14 +258,6 @@
   pruneopts = "UT"
   revision = "4b7aa43c6742a2c18fdef89dd197aaae7dac7ccd"
   version = "1.0.1"
-
-[[projects]]
-  digest = "1:856bc61da6784c3cf562f4f269c33555c5ecd7684e37c124c9fb7d0510ed6305"
-  name = "github.com/openfaas/faas-provider"
-  packages = ["types"]
-  pruneopts = "UT"
-  revision = "8b3147b013c651d5f017b31fa1225ae21e1dc93d"
-  version = "0.8.0"
 
 [[projects]]
   branch = "master"
