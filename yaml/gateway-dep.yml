@@ -95,15 +95,15 @@ spec:
          - --listen-client-urls
          - http://0.0.0.0:2379
          - --advertise-client-urls
-         - http://etcd:2379
+         - http://0.0.0.0:2379
          - --initial-cluster
          - etcd=http://0.0.0.0:2380
          - --initial-cluster-state
          - new
-       ports:
-        - containerPort: 2379
-          name: client
-          protocol: TCP
-        - containerPort: 2380
-          name: server
-          protocol: TCP
+        ports:
+         - containerPort: 2379
+           name: client
+           protocol: TCP
+         - containerPort: 2380
+           name: server
+           protocol: TCP
