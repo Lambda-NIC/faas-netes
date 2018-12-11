@@ -8,6 +8,8 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"context"
+	"sort"
 
 	"github.com/Lambda-NIC/faas/gateway/requests"
 	v1beta1 "k8s.io/api/extensions/v1beta1"
@@ -29,6 +31,26 @@ func MakeFunctionReader(functionNamespace string,
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte(err.Error()))
 			return
+		}
+
+		resp, err := keysAPI.Get(context.Background(), "/functions", nil)
+		if err == nil {
+			// print directory keys
+			sort.Sort(resp.Node.Nodes)
+			for _, n := range resp.Node.Nodes {
+				// TODO: Get the right number of replicas
+				function := requests.Function{
+					Name:              n.Key,
+					Replicas:          4,
+					Image:             "smartnic",
+					AvailableReplicas: uint64(4),
+					InvocationCount:   0,
+					Labels:            nil,
+					Annotations: 	   	 nil,
+				}
+				functions = append(functions, function)
+    		fmt.Printf("Got Function Key: %q, Value: %q\n", n.Key, n.Value)
+			}
 		}
 
 		functionBytes, _ := json.Marshal(functions)
@@ -58,6 +80,7 @@ func getServiceList(functionNamespace string,
 			functions = append(functions, *function)
 		}
 	}
+
 	return functions, nil
 }
 

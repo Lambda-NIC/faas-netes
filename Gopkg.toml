@@ -25,7 +25,7 @@
 
 [[constraint]]
   name = "github.com/Lambda-NIC/faas-netes"
-  revision = "1a52df4a66d48683ac25b151aa533f6ea87d85a4"
+  revision = "d5fe3aac90ec73b04bae4e08543ddf6380c1a146"
 
 [[constraint]]
   name = "github.com/Lambda-NIC/faas"

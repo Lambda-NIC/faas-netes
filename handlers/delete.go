@@ -9,6 +9,9 @@ import (
 	"net/http"
 	"strings"
 	"log"
+	"fmt"
+	"context"
+	"strconv"
 
 	"github.com/Lambda-NIC/faas/gateway/requests"
 	v1beta1 "k8s.io/api/extensions/v1beta1"
@@ -19,7 +22,9 @@ import (
 )
 
 // MakeDeleteHandler delete a function
-func MakeDeleteHandler(functionNamespace string, keysAPI client.KeysAPI,
+func MakeDeleteHandler(functionNamespace string,
+											 keysAPI client.KeysAPI,
+											 smartNICs *[]string,
 											 clientset *kubernetes.Clientset) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		defer r.Body.Close()
@@ -39,22 +44,45 @@ func MakeDeleteHandler(functionNamespace string, keysAPI client.KeysAPI,
 
 		// LambdaNIC: Delete scheme for lambdaNIC
 		if strings.Contains(request.FunctionName, "lambdaNIC") {
+			node, err := keysAPI.Get(context.Background(), "numServers", nil)
+			if err != nil {
+				w.WriteHeader(http.StatusBadRequest)
+				w.Write([]byte("Error Deleting Function:" + request.FunctionName))
+				log.Println("No numServers key: " + err.Error())
+				return
+			}
+			numServers, err := strconv.Atoi(node.Node.String())
+			if err != nil {
+				log.Fatal("Invalid numServer value in etcd db: " + node.Node.String())
+			}
 			// Check if this service exists
-			if _, ok := lambdaNICJobIDs[request.FunctionName]; !ok {
-				w.WriteHeader(http.StatusNotFound)
-				w.Write([]byte(request.FunctionName + " not found."))
+			var jobID string = fmt.Sprintf("/functions/%s", request.FunctionName)
+			_, err = keysAPI.Get(context.Background(), jobID, nil)
+			if err != nil {
+				if client.IsKeyNotFound(err) {
+					w.WriteHeader(http.StatusBadRequest)
+					w.Write([]byte(request.FunctionName + " does not exist"))
+					return
+				}
+				w.WriteHeader(http.StatusBadRequest)
+				w.Write([]byte("Error Deleting Function:" + request.FunctionName))
+				log.Println("Error: " + err.Error())
 				return
 			}
 
-			for i, smartNIC := range smartNICs {
+			for i := 0; i < numServers; i++ {
 				log.Println("Deleted ")
-				if numDep, ok := numDeployments[i][request.FunctionName]; !ok {
-					log.Println("Deleted " + string(numDep) +
-											" deployments in " + smartNIC)
-					delete(numDeployments[i], request.FunctionName)
+				var depKey string = fmt.Sprintf("/deployments/smartnic%d/%s",
+																				 i,
+																				 request.FunctionName)
+				_, err = keysAPI.Delete(context.Background(), depKey, nil)
+				if err != nil {
+					w.WriteHeader(http.StatusBadRequest)
+					w.Write([]byte("Error Deleting Function:" + request.FunctionName))
+					return
 				}
+				log.Printf("Deleted %s in server %d\n", request.FunctionName, i)
 			}
-			delete(lambdaNICJobIDs, request.FunctionName)
 
 			log.Println("Deleted SmartNIC service - " + request.FunctionName)
 			log.Println(string(body))

@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"time"
+	"strings"
 
 	"github.com/Lambda-NIC/faas/gateway/requests"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -31,15 +32,24 @@ func MakeUpdateHandler(functionNamespace string,
 			return
 		}
 
-		annotations := buildAnnotations(request)
-		if err, status := updateDeploymentSpec(functionNamespace, clientset, request, annotations); err != nil {
-			w.WriteHeader(status)
-			w.Write([]byte(err.Error()))
-		}
+		// LambdaNIC: Update a function
+		if strings.Contains(request.Service, "lambdaNIC") {
+			// TODO: Need to do this.
+			w.Write([]byte("Updated!"))
+		} else {
+			annotations := buildAnnotations(request)
+			if status, err := updateDeploymentSpec(functionNamespace,
+																						 clientset, request,
+																						 annotations); err != nil {
+				w.WriteHeader(status)
+				w.Write([]byte(err.Error()))
+			}
 
-		if err, status := updateService(functionNamespace, clientset, request, annotations); err != nil {
-			w.WriteHeader(status)
-			w.Write([]byte(err.Error()))
+			if status, err := updateService(functionNamespace, clientset,
+																			request, annotations); err != nil {
+				w.WriteHeader(status)
+				w.Write([]byte(err.Error()))
+			}
 		}
 
 		w.WriteHeader(http.StatusAccepted)
@@ -50,7 +60,7 @@ func updateDeploymentSpec(
 	functionNamespace string,
 	clientset *kubernetes.Clientset,
 	request requests.CreateFunctionRequest,
-	annotations map[string]string) (err error, httpStatus int) {
+	annotations map[string]string) (httpStatus int, err error) {
 	getOpts := metav1.GetOptions{}
 
 	deployment, findDeployErr := clientset.ExtensionsV1beta1().
@@ -58,7 +68,7 @@ func updateDeploymentSpec(
 		Get(request.Service, getOpts)
 
 	if findDeployErr != nil {
-		return findDeployErr, http.StatusNotFound
+		return http.StatusNotFound, findDeployErr
 	}
 
 	if len(deployment.Spec.Template.Spec.Containers) > 0 {
@@ -99,20 +109,20 @@ func updateDeploymentSpec(
 
 		resources, resourceErr := createResources(request)
 		if resourceErr != nil {
-			return resourceErr, http.StatusBadRequest
+			return http.StatusBadRequest, resourceErr
 		}
 
 		deployment.Spec.Template.Spec.Containers[0].Resources = *resources
 
 		existingSecrets, err := getSecrets(clientset, functionNamespace, request.Secrets)
 		if err != nil {
-			return err, http.StatusBadRequest
+			return http.StatusBadRequest, err
 		}
 
 		err = UpdateSecrets(request, deployment, existingSecrets)
 		if err != nil {
 			log.Println(err)
-			return err, http.StatusBadRequest
+			return http.StatusBadRequest, err
 		}
 	}
 
@@ -120,17 +130,17 @@ func updateDeploymentSpec(
 		Deployments(functionNamespace).
 		Update(deployment); updateErr != nil {
 
-		return updateErr, http.StatusInternalServerError
+		return http.StatusInternalServerError, updateErr
 	}
 
-	return nil, http.StatusAccepted
+	return http.StatusAccepted, nil
 }
 
 func updateService(
 	functionNamespace string,
 	clientset *kubernetes.Clientset,
 	request requests.CreateFunctionRequest,
-	annotations map[string]string) (err error, httpStatus int) {
+	annotations map[string]string) (httpStatus int, err error) {
 
 	getOpts := metav1.GetOptions{}
 
@@ -139,7 +149,7 @@ func updateService(
 		Get(request.Service, getOpts)
 
 	if findServiceErr != nil {
-		return findServiceErr, http.StatusNotFound
+		return http.StatusNotFound, findServiceErr
 	}
 
 	service.Annotations = annotations
@@ -148,8 +158,8 @@ func updateService(
 		Services(functionNamespace).
 		Update(service); updateErr != nil {
 
-		return updateErr, http.StatusInternalServerError
+		return http.StatusInternalServerError, updateErr
 	}
 
-	return nil, http.StatusAccepted
+	return http.StatusAccepted, nil
 }

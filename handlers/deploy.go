@@ -16,6 +16,7 @@ import (
 	"strings"
 	"time"
 	"math/rand"
+	"context"
 
 	"github.com/Lambda-NIC/faas/gateway/requests"
 	apiv1 "k8s.io/api/core/v1"
@@ -48,13 +49,6 @@ func ValidateDeployRequest(request *requests.CreateFunctionRequest) error {
 	return fmt.Errorf("(%s) must be a valid DNS entry for service name", request.Service)
 }
 
-// LambdaNIC: List of SmartNICs to use and how many deployments are there.
-var smartNICs = [4]string{"20.20.20.101", "20.20.20.102",
-													"20.20.20.103", "20.20.20.104"}
-// LambdaNIC: Contains the number of deployments per smartNIC server
-var numDeployments [4]map[string]uint8
-var lambdaNICJobIDs map[string]string
-
 // FunctionProbeConfig specify options for Liveliness and Readiness checks
 type FunctionProbeConfig struct {
 	InitialDelaySeconds int32
@@ -73,6 +67,7 @@ type DeployHandlerConfig struct {
 // MakeDeployHandler creates a handler to create new functions in the cluster
 func MakeDeployHandler(functionNamespace string,
 											 keysAPI client.KeysAPI,
+											 smartNICs *[]string,
 											 clientset *kubernetes.Clientset,
 											 config *DeployHandlerConfig) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -87,7 +82,7 @@ func MakeDeployHandler(functionNamespace string,
 			return
 		}
 
-		if err := ValidateDeployRequest(&request); err != nil {
+		if err = ValidateDeployRequest(&request); err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			w.Write([]byte(err.Error()))
 			return
@@ -96,20 +91,44 @@ func MakeDeployHandler(functionNamespace string,
 		// LambdaNIC: Deployment scheme for lambdaNIC
 		if strings.Contains(request.Service, "lambdaNIC") {
 			// Check if this service already exists
-			if _, ok := lambdaNICJobIDs[request.Service]; ok {
+			var jobID string = fmt.Sprintf("/functions/%s", request.Service)
+			_, err = keysAPI.Get(context.Background(), jobID, nil)
+			if err != nil {
+				if !client.IsKeyNotFound(err) {
+					w.WriteHeader(http.StatusBadRequest)
+					w.Write([]byte(request.Service + " already exists"))
+					return
+				}
 				w.WriteHeader(http.StatusBadRequest)
-				w.Write([]byte(request.Service + " already exists"))
+				w.Write([]byte("Error Creating Service:" + request.Service))
+				log.Println("Error: " + err.Error())
 				return
 			}
 			// Assign a uid to the job
 			uid := fmt.Sprintf("%d", time.Now().Nanosecond())
-			lambdaNICJobIDs[request.Service] = uid
-
-			randIdx := rand.Intn(len(smartNICs))
-			numDeployments[randIdx][request.Service] = 1
-
+			etcdResp, etcdErr := keysAPI.Set(context.Background(), jobID, uid, nil)
+			if etcdErr != nil {
+				w.WriteHeader(http.StatusBadRequest)
+				w.Write([]byte("Error Creating Service:" + request.Service))
+				return
+			}
+			log.Printf("Added uid: %s to job: %s to ETCD. Metadata is %q\n",
+								 uid, request.Service, etcdResp)
+			// Randomly assign service to a smartnic
+			randIdx := rand.Intn(len(*smartNICs))
+			var depKey string = fmt.Sprintf("/deployments/smartnic%d/%s",
+																			 randIdx,
+																			 request.Service)
+			etcdResp, etcdErr = keysAPI.Set(context.Background(), depKey, "1", nil)
+			if etcdErr != nil {
+				w.WriteHeader(http.StatusBadRequest)
+				w.Write([]byte("Error Creating Service:" + request.Service))
+				return
+			}
+			log.Printf("Added 1 Dep: %s to ECTD. Metadata is %q\n",
+								 depKey, etcdResp)
 			log.Println("Created SmartNIC service - " + request.Service + " at " +
-									smartNICs[randIdx])
+									(*smartNICs)[randIdx])
 			log.Println(string(body))
 		} else {
 			existingSecrets, err :=
@@ -146,7 +165,7 @@ func MakeDeployHandler(functionNamespace string,
 			_, err = service.Create(serviceSpec)
 
 			if err != nil {
-				log.Println(err)
+			  log.Println(err)
 				w.WriteHeader(http.StatusInternalServerError)
 				w.Write([]byte(err.Error()))
 				return

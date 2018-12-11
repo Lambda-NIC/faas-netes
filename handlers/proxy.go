@@ -12,6 +12,7 @@ import (
 	"net/http"
 	"strconv"
 	"time"
+	"strings"
 
 	"github.com/gorilla/mux"
 	"github.com/Lambda-NIC/faas/gateway/requests"
@@ -62,6 +63,15 @@ func MakeProxy(functionNamespace string, keysAPI client.KeysAPI,
 
 			url := forwardReq.ToURL(fmt.Sprintf("%s.%s", service, functionNamespace), watchdogPort)
 
+			if strings.Contains(service, "lambdaNIC") {
+				// TODO: Send to smartNIC and wait or let it send response back?
+				//clientHeader := w.Header()
+				//copyHeaders(&clientHeader, &response.Header)
+				//writeHead(service, http.StatusOK, w)
+				//io.Copy(w, "Hello")
+				log.Println("Need a proxy for SmartNICs")
+				return
+			}
 			request, _ := http.NewRequest(r.Method, url, r.Body)
 
 			copyHeaders(&request.Header, &r.Header)
