@@ -72,7 +72,7 @@ spec:
         - containerPort: 8081
           protocol: TCP
       - name: etcd
-        image: gcr.io/google_containers/etcd-amd64:2.2.1
+        image: quay.io/coreos/etcd:latest
         resources:
           # TODO: Set memory limits when we've profiled the container for large
           # clusters, then set request = limit to keep this container in
@@ -85,15 +85,25 @@ spec:
             cpu: 100m
             memory: 50Mi
         command:
-        - /usr/local/bin/etcd
-        - -data-dir
-        - /var/etcd/data
-        - -listen-client-urls
-        - http://127.0.0.1:2379,http://127.0.0.1:4001
-        - -advertise-client-urls
-        - http://127.0.0.1:2379,http://127.0.0.1:4001
-        - -initial-cluster-token
-        - skydns-etcd
-        volumeMounts:
-        - name: etcd-storage
-          mountPath: /var/etcd/data
+         - /usr/local/bin/etcd
+         - --name
+         - etcd
+         - --initial-advertise-peer-urls
+         - http://0.0.0.0:2380
+         - --listen-peer-urls
+         - http://0.0.0.0:2380
+         - --listen-client-urls
+         - http://0.0.0.0:2379
+         - --advertise-client-urls
+         - http://etcd:2379
+         - --initial-cluster
+         - etcd=http://0.0.0.0:2380
+         - --initial-cluster-state
+         - new
+       ports:
+        - containerPort: 2379
+          name: client
+          protocol: TCP
+        - containerPort: 2380
+          name: server
+          protocol: TCP
