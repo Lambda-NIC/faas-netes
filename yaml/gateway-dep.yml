@@ -13,7 +13,7 @@ spec:
       serviceAccountName: faas-controller
       containers:
       - name: gateway
-        image: yo2seol/gateway:latest
+        image: lambdanic/faas-gateway:latest
         imagePullPolicy: Always
         livenessProbe:
           httpGet:
@@ -57,7 +57,7 @@ spec:
           limits:
             memory: 250Mi   # Adjust to suit needs of deployment
       - name: faas-netes
-        image: yo2seol/faas-netes:latest
+        image: lambdanic/faas-netes:latest
         imagePullPolicy: Always
         env:
         - name: port
