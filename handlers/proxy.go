@@ -37,7 +37,7 @@ func MakeProxy(functionNamespace string, keysAPI client.KeysAPI,
 	}
 
 	return func(w http.ResponseWriter, r *http.Request) {
-
+		log.Println("Got Proxy")
 		if r.Body != nil {
 			defer r.Body.Close()
 		}

@@ -45,10 +45,13 @@ func MakeDeleteHandler(functionNamespace string,
 		// LambdaNIC: Delete scheme for lambdanic
 		if strings.Contains(request.FunctionName, "lambdanic") {
 			log.Printf("Got request to delete: %s", request.FunctionName)
+			splitStr := strings.Split(request.FunctionName, "/")
+			_, functionName := splitStr[0], splitStr[1]
+
 			node, err := keysAPI.Get(context.Background(), "numServers", nil)
 			if err != nil {
 				w.WriteHeader(http.StatusBadRequest)
-				w.Write([]byte("Error Deleting Function:" + request.FunctionName))
+				w.Write([]byte("Error Deleting Function:" + functionName))
 				log.Println("No numServers key: " + err.Error())
 				return
 			}
@@ -58,31 +61,32 @@ func MakeDeleteHandler(functionNamespace string,
 			}
 			log.Printf("%d servers available\n", numServers)
 
+
 			// Check if this service exists
-			var jobID string = fmt.Sprintf("/functions/%s", request.FunctionName)
-			log.Printf("Deleting function with ID: %s\n", request.FunctionName)
+			var jobID string = fmt.Sprintf("/functions/%s", functionName)
+			log.Printf("Deleting function with key: %s\n", jobID)
 			_, err = keysAPI.Delete(context.Background(), jobID, nil)
 			if err != nil {
 				w.WriteHeader(http.StatusBadRequest)
-				w.Write([]byte("Error Deleting Function:" + request.FunctionName))
+				w.Write([]byte("Error Deleting Function:" + functionName))
 				log.Println("Error: " + err.Error())
 				return
 			}
-			log.Printf("Deleted Function: %s\n", request.FunctionName)
+			log.Printf("Deleted Function: %s\n", functionName)
 
 			for i := 0; i < numServers; i++ {
 				log.Println("Deleting deployment.")
 				var depKey string = fmt.Sprintf("/deployments/smartnic%d/%s",
 																				 i,
-																				 request.FunctionName)
+																				 functionName)
 				_, err = keysAPI.Delete(context.Background(), depKey, nil)
 				if err != nil {
 					log.Printf("Couldn't find deployment at server %d\n", i)
 				} else {
-					log.Printf("Deleted %s in server %d\n", request.FunctionName, i)
+					log.Printf("Deleted %s in server %d\n", functionName, i)
 				}
 			}
-			log.Println("Deleted SmartNIC service - " + request.FunctionName)
+			log.Println("Deleted SmartNIC service - " + functionName)
 			log.Println(string(body))
 		} else {
 			getOpts := metav1.GetOptions{}

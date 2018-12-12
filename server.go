@@ -9,7 +9,6 @@ import (
 	"log"
 	"os"
 	"time"
-	"strconv"
 
 	"github.com/Lambda-NIC/faas-netes/handlers"
 	"github.com/Lambda-NIC/faas-netes/types"
