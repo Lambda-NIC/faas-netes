@@ -10,7 +10,7 @@
   version = "0.9.11"
 
 [[projects]]
-  digest = "1:b70607d9f7efd0005c2db4870f5137dcd25e604a21d9599eb9d693b399ff13ad"
+  digest = "1:d1daf6f043462b2fc2c23fa91bf86a38ed113f8922810a95214eb5c0d4412d34"
   name = "github.com/Lambda-NIC/faas-netes"
   packages = [
     "handlers",
@@ -18,7 +18,7 @@
     "version",
   ]
   pruneopts = "UT"
-  revision = "06c72230fcaaa0697b4a67f1b19d33b40feaa846"
+  revision = "9583f21f8f9640fc7b70fd6b1c2e8eb2ec303241"
 
 [[projects]]
   digest = "1:c516cbdb9db9edf40602242ccf8baea3762660a114bcf23889f0d0242fc9c0a6"

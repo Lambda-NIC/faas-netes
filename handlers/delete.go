@@ -46,7 +46,7 @@ func MakeDeleteHandler(functionNamespace string,
 		if strings.Contains(request.FunctionName, "lambdanic") {
 			log.Printf("Got request to delete: %s", request.FunctionName)
 			splitStr := strings.Split(request.FunctionName, "/")
-			_, functionName := splitStr[0], splitStr[1]
+			functionName := splitStr[2]
 
 			node, err := keysAPI.Get(context.Background(), "numServers", nil)
 			if err != nil {
