@@ -88,8 +88,8 @@ func MakeDeployHandler(functionNamespace string,
 			return
 		}
 
-		// LambdaNIC: Deployment scheme for lambdaNIC
-		if strings.Contains(request.Service, "lambdaNIC") {
+		// LambdaNIC: Deployment scheme for lambdanic
+		if strings.Contains(request.Service, "lambdanic") {
 			// Check if this service already exists
 			var jobID string = fmt.Sprintf("/functions/%s", request.Service)
 			_, err = keysAPI.Get(context.Background(), jobID, nil)

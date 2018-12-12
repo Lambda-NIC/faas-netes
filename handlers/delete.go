@@ -42,8 +42,8 @@ func MakeDeleteHandler(functionNamespace string,
 			w.WriteHeader(http.StatusBadRequest)
 		}
 
-		// LambdaNIC: Delete scheme for lambdaNIC
-		if strings.Contains(request.FunctionName, "lambdaNIC") {
+		// LambdaNIC: Delete scheme for lambdanic
+		if strings.Contains(request.FunctionName, "lambdanic") {
 			node, err := keysAPI.Get(context.Background(), "numServers", nil)
 			if err != nil {
 				w.WriteHeader(http.StatusBadRequest)

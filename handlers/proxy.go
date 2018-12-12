@@ -63,7 +63,7 @@ func MakeProxy(functionNamespace string, keysAPI client.KeysAPI,
 
 			url := forwardReq.ToURL(fmt.Sprintf("%s.%s", service, functionNamespace), watchdogPort)
 
-			if strings.Contains(service, "lambdaNIC") {
+			if strings.Contains(service, "lambdanic") {
 				// TODO: Send to smartNIC and wait or let it send response back?
 				//clientHeader := w.Header()
 				//copyHeaders(&clientHeader, &response.Header)
