@@ -11,6 +11,8 @@ spec:
         app: gateway
     spec:
       serviceAccountName: faas-controller
+      nodeSelector:
+        smartnic: disabled
       containers:
       - name: gateway
         image: lambdanic/faas-gateway:latest

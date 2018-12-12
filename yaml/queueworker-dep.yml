@@ -10,6 +10,8 @@ spec:
       labels:
         app: queue-worker
     spec:
+      nodeSelector:
+        smartnic: disabled
       containers:
       - name:  queue-worker
         image: openfaas/queue-worker:0.5.4

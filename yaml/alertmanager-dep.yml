@@ -10,6 +10,8 @@ spec:
       labels:
         app: alertmanager
     spec:
+      nodeSelector:
+        smartnic: disabled
       containers:
       - name: alertmanager
         image: prom/alertmanager:v0.15.0
