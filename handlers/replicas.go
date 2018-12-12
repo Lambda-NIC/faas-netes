@@ -4,25 +4,25 @@
 package handlers
 
 import (
+	"context"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"strings"
-	"context"
-	"fmt"
 
-	"github.com/gorilla/mux"
-	"github.com/Lambda-NIC/faas/gateway/requests"
 	"github.com/Lambda-NIC/faas-netes/types"
+	"github.com/Lambda-NIC/faas/gateway/requests"
+	"github.com/gorilla/mux"
+	"go.etcd.io/etcd/client"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
-	"go.etcd.io/etcd/client"
 )
 
 // MakeReplicaUpdater updates desired count of replicas
 func MakeReplicaUpdater(functionNamespace string, keysAPI client.KeysAPI,
-											  clientset *kubernetes.Clientset) http.HandlerFunc {
+	clientset *kubernetes.Clientset) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		log.Println("Update replicas")
 
@@ -78,8 +78,8 @@ func MakeReplicaUpdater(functionNamespace string, keysAPI client.KeysAPI,
 
 // MakeReplicaReader reads the amount of replicas for a deployment
 func MakeReplicaReader(functionNamespace string,
-											 keysAPI client.KeysAPI,
-											 clientset *kubernetes.Clientset) http.HandlerFunc {
+	keysAPI client.KeysAPI,
+	clientset *kubernetes.Clientset) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		log.Println("Read replicas")
 
@@ -91,8 +91,8 @@ func MakeReplicaReader(functionNamespace string,
 		// TODO: Fix this.
 		if strings.Contains(functionName, "lambdanic") {
 			resp, err := keysAPI.Get(context.Background(),
-															 fmt.Sprintf("/functions/%s", functionName),
-															 nil)
+				fmt.Sprintf("/functions/%s", functionName),
+				nil)
 			if err == nil {
 				function = requests.Function{
 					Name:              functionName,
@@ -100,12 +100,10 @@ func MakeReplicaReader(functionNamespace string,
 					Image:             "smartnic",
 					AvailableReplicas: uint64(4),
 					InvocationCount:   0,
-					Labels:            nil,
-					Annotations: 	   	 nil,
 				}
 				fmt.Printf("Replica Read Key: %q, Value: %q\n",
-									 resp.Node.Key,
-									 resp.Node.Value)
+					resp.Node.Key,
+					resp.Node.Value)
 			}
 		} else {
 			function, err := getService(functionNamespace, functionName, clientset)

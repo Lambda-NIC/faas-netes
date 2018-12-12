@@ -48,8 +48,6 @@ func MakeFunctionReader(functionNamespace string,
 					Image:             "smartnic",
 					AvailableReplicas: uint64(4),
 					InvocationCount:   0,
-					Labels:            nil,
-					Annotations:       nil,
 				}
 				functions = append(functions, function)
 				fmt.Printf("Got Function Key: %q, Value: %q\n", n.Key, n.Value)
