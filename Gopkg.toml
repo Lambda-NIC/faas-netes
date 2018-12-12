@@ -5,7 +5,8 @@
 
 [[constraint]]
   name = "github.com/Lambda-NIC/faas-provider"
-  revision = "0f135d552e5df242cbbef5d980fcd8a498ba4833"
+  branch = "master"
+
 
 [[constraint]]
   name = "k8s.io/apimachinery"
@@ -25,8 +26,8 @@
 
 [[constraint]]
   name = "github.com/Lambda-NIC/faas-netes"
-  revision = "e89f95e53d0467fea68bcf5dffac19aed5320aa8"
+  branch = "master"
 
 [[constraint]]
   name = "github.com/Lambda-NIC/faas"
-  version = "0.9.11"
+  branch = "master"
