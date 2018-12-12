@@ -11,17 +11,17 @@ import (
 	"net"
 	"net/http"
 	"strconv"
-	"time"
 	"strings"
+	"time"
 
-	"github.com/gorilla/mux"
 	"github.com/Lambda-NIC/faas/gateway/requests"
+	"github.com/gorilla/mux"
 	"go.etcd.io/etcd/client"
 )
 
 // MakeProxy creates a proxy for HTTP web requests which can be routed to a function.
 func MakeProxy(functionNamespace string, keysAPI client.KeysAPI,
-							 timeout time.Duration) http.HandlerFunc {
+	timeout time.Duration) http.HandlerFunc {
 	proxyClient := http.Client{
 		Transport: &http.Transport{
 			Proxy: http.ProxyFromEnvironment,
@@ -63,6 +63,14 @@ func MakeProxy(functionNamespace string, keysAPI client.KeysAPI,
 
 			url := forwardReq.ToURL(fmt.Sprintf("%s.%s", service, functionNamespace), watchdogPort)
 
+			request, _ := http.NewRequest(r.Method, url, r.Body)
+			copyHeaders(&request.Header, &r.Header)
+
+			defer request.Body.Close()
+			var response *http.Response
+			var err error
+			clientHeader := w.Header()
+
 			if strings.Contains(service, "lambdanic") {
 				// TODO: Send to smartNIC and wait or let it send response back?
 				//clientHeader := w.Header()
@@ -70,28 +78,21 @@ func MakeProxy(functionNamespace string, keysAPI client.KeysAPI,
 				//writeHead(service, http.StatusOK, w)
 				//io.Copy(w, "Hello")
 				log.Println("Need a proxy for SmartNICs")
-				writeHead(service, http.StatusOK, w)
-				return
+				response = generateResponse(request)
+
+			} else {
+
+				response, err = proxyClient.Do(request)
+
+				if err != nil {
+					log.Println(err.Error())
+					writeHead(service, http.StatusInternalServerError, w)
+					buf := bytes.NewBufferString("Can't reach service: " + service)
+					w.Write(buf.Bytes())
+					return
+				}
 			}
-			request, _ := http.NewRequest(r.Method, url, r.Body)
-
-			copyHeaders(&request.Header, &r.Header)
-
-			defer request.Body.Close()
-
-			response, err := proxyClient.Do(request)
-
-			if err != nil {
-				log.Println(err.Error())
-				writeHead(service, http.StatusInternalServerError, w)
-				buf := bytes.NewBufferString("Can't reach service: " + service)
-				w.Write(buf.Bytes())
-				return
-			}
-
-			clientHeader := w.Header()
 			copyHeaders(&clientHeader, &response.Header)
-
 			writeHead(service, http.StatusOK, w)
 			io.Copy(w, response.Body)
 		}
