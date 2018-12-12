@@ -97,13 +97,12 @@ func MakeDeployHandler(functionNamespace string,
 				w.WriteHeader(http.StatusBadRequest)
 				w.Write([]byte(request.Service + " already exists"))
 				return
-			} else {
-				if !client.IsKeyNotFound(err) {
-					w.WriteHeader(http.StatusBadRequest)
-					w.Write([]byte("Error Creating Service:" + request.Service))
-					log.Println("Error: " + err.Error())
-					return
-				}
+			}
+			if !client.IsKeyNotFound(err) {
+				w.WriteHeader(http.StatusBadRequest)
+				w.Write([]byte("Error Creating Service:" + request.Service))
+				log.Println("Error: " + err.Error())
+				return
 			}
 			// Assign a uid to the job
 			uid := fmt.Sprintf("%d", time.Now().Nanosecond())

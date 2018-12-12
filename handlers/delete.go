@@ -51,9 +51,9 @@ func MakeDeleteHandler(functionNamespace string,
 				log.Println("No numServers key: " + err.Error())
 				return
 			}
-			numServers, err := strconv.Atoi(node.Node.String())
+			numServers, err := strconv.Atoi(node.Node.Value)
 			if err != nil {
-				log.Fatal("Invalid numServer value in etcd db: " + node.Node.String())
+				log.Fatal("Invalid numServer value in etcd db: " + node.Node.Value)
 			}
 			// Check if this service exists
 			var jobID string = fmt.Sprintf("/functions/%s", request.FunctionName)

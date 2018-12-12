@@ -70,6 +70,7 @@ func MakeProxy(functionNamespace string, keysAPI client.KeysAPI,
 				//writeHead(service, http.StatusOK, w)
 				//io.Copy(w, "Hello")
 				log.Println("Need a proxy for SmartNICs")
+				writeHead(service, http.StatusOK, w)
 				return
 			}
 			request, _ := http.NewRequest(r.Method, url, r.Body)
