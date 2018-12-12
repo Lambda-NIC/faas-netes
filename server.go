@@ -9,6 +9,7 @@ import (
 	"log"
 	"os"
 	"time"
+	"strconv"
 
 	"github.com/Lambda-NIC/faas-netes/handlers"
 	"github.com/Lambda-NIC/faas-netes/types"
@@ -159,8 +160,9 @@ func main() {
 				i, resp)
 		}
 	}
-	_, err = keysAPI.Set(context.Background(), "numServers",
-		string(len(smartNICs)), nil)
+	_, err = keysAPI.Set(context.Background(),
+											 "numServers",
+											 strconv.Itoa(len(smartNICs)), nil)
 	if err != nil {
 		log.Fatal(err)
 	} else {
