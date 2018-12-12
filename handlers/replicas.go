@@ -8,8 +8,12 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"strings"
+	"context"
+	"fmt"
 
 	"github.com/gorilla/mux"
+	"github.com/Lambda-NIC/faas/gateway/requests"
 	"github.com/Lambda-NIC/faas-netes/types"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
@@ -38,31 +42,34 @@ func MakeReplicaUpdater(functionNamespace string, keysAPI client.KeysAPI,
 				return
 			}
 		}
+		if strings.Contains(functionName, "lambdanic") {
+			log.Printf("Updating replica for %s\n", functionName)
+		} else {
+			options := metav1.GetOptions{
+				TypeMeta: metav1.TypeMeta{
+					Kind:       "Deployment",
+					APIVersion: "extensions/v1beta1",
+				},
+			}
+			deployment, err := clientset.ExtensionsV1beta1().Deployments(functionNamespace).Get(functionName, options)
 
-		options := metav1.GetOptions{
-			TypeMeta: metav1.TypeMeta{
-				Kind:       "Deployment",
-				APIVersion: "extensions/v1beta1",
-			},
-		}
-		deployment, err := clientset.ExtensionsV1beta1().Deployments(functionNamespace).Get(functionName, options)
+			if err != nil {
+				w.WriteHeader(http.StatusInternalServerError)
+				w.Write([]byte("Unable to lookup function deployment " + functionName))
+				log.Println(err)
+				return
+			}
 
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			w.Write([]byte("Unable to lookup function deployment " + functionName))
-			log.Println(err)
-			return
-		}
+			replicas := int32(req.Replicas)
+			deployment.Spec.Replicas = &replicas
+			_, err = clientset.ExtensionsV1beta1().Deployments(functionNamespace).Update(deployment)
 
-		replicas := int32(req.Replicas)
-		deployment.Spec.Replicas = &replicas
-		_, err = clientset.ExtensionsV1beta1().Deployments(functionNamespace).Update(deployment)
-
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			w.Write([]byte("Unable to update function deployment " + functionName))
-			log.Println(err)
-			return
+			if err != nil {
+				w.WriteHeader(http.StatusInternalServerError)
+				w.Write([]byte("Unable to update function deployment " + functionName))
+				log.Println(err)
+				return
+			}
 		}
 
 		w.WriteHeader(http.StatusAccepted)
@@ -78,16 +85,39 @@ func MakeReplicaReader(functionNamespace string,
 
 		vars := mux.Vars(r)
 		functionName := vars["name"]
+		var function requests.Function
 
-		function, err := getService(functionNamespace, functionName, clientset)
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
+		// LambdaNIC: create dummy replica values.
+		// TODO: Fix this.
+		if strings.Contains(functionName, "lambdanic") {
+			resp, err := keysAPI.Get(context.Background(),
+															 fmt.Sprintf("/functions/%s", functionName),
+															 nil)
+			if err == nil {
+				function = requests.Function{
+					Name:              functionName,
+					Replicas:          4,
+					Image:             "smartnic",
+					AvailableReplicas: uint64(4),
+					InvocationCount:   0,
+					Labels:            nil,
+					Annotations: 	   	 nil,
+				}
+				fmt.Printf("Replica Read Key: %q, Value: %q\n",
+									 resp.Node.Key,
+									 resp.Node.Value)
+			}
+		} else {
+			function, err := getService(functionNamespace, functionName, clientset)
+			if err != nil {
+				w.WriteHeader(http.StatusInternalServerError)
+				return
+			}
 
-		if function == nil {
-			w.WriteHeader(http.StatusNotFound)
-			return
+			if function == nil {
+				w.WriteHeader(http.StatusNotFound)
+				return
+			}
 		}
 
 		functionBytes, _ := json.Marshal(function)
