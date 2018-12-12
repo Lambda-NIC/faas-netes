@@ -162,7 +162,8 @@ func main() {
 	}
 	_, err = keysAPI.Set(context.Background(),
 											 "numServers",
-											 strconv.Itoa(len(smartNICs)), nil)
+											 fmt.Sprintf("%d", len(smartNICs)),
+											 nil)
 	if err != nil {
 		log.Fatal(err)
 	} else {
