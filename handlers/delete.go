@@ -4,28 +4,28 @@
 package handlers
 
 import (
-	"encoding/json"
-	"io/ioutil"
-	"net/http"
-	"strings"
-	"log"
-	"fmt"
 	"context"
+	"encoding/json"
+	"fmt"
+	"io/ioutil"
+	"log"
+	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/Lambda-NIC/faas/gateway/requests"
+	"go.etcd.io/etcd/client"
 	v1beta1 "k8s.io/api/extensions/v1beta1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
-	"go.etcd.io/etcd/client"
 )
 
 // MakeDeleteHandler delete a function
 func MakeDeleteHandler(functionNamespace string,
-											 keysAPI client.KeysAPI,
-											 smartNICs *[]string,
-											 clientset *kubernetes.Clientset) http.HandlerFunc {
+	keysAPI client.KeysAPI,
+	smartNICs *[]string,
+	clientset *kubernetes.Clientset) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		defer r.Body.Close()
 
@@ -61,7 +61,6 @@ func MakeDeleteHandler(functionNamespace string,
 			}
 			log.Printf("%d servers available\n", numServers)
 
-
 			// Check if this service exists
 			var jobID string = fmt.Sprintf("/functions/%s", functionName)
 			log.Printf("Deleting function with key: %s\n", jobID)
@@ -77,8 +76,8 @@ func MakeDeleteHandler(functionNamespace string,
 			for i := 0; i < numServers; i++ {
 				log.Println("Deleting deployment.")
 				var depKey string = fmt.Sprintf("/deployments/smartnic%d/%s",
-																				 i,
-																				 functionName)
+					i,
+					functionName)
 				_, err = keysAPI.Delete(context.Background(), depKey, nil)
 				if err != nil {
 					log.Printf("Couldn't find deployment at server %d\n", i)

@@ -4,25 +4,26 @@
 package handlers
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
-	"context"
 	"sort"
+	"strings"
 
 	"github.com/Lambda-NIC/faas/gateway/requests"
+	"go.etcd.io/etcd/client"
 	v1beta1 "k8s.io/api/extensions/v1beta1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
-	"go.etcd.io/etcd/client"
 )
 
 // MakeFunctionReader handler for reading functions deployed in the cluster as deployments.
 func MakeFunctionReader(functionNamespace string,
-												keysAPI client.KeysAPI,
-												clientset *kubernetes.Clientset) http.HandlerFunc {
+	keysAPI client.KeysAPI,
+	clientset *kubernetes.Clientset) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
 		functions, err := getServiceList(functionNamespace, clientset)
@@ -38,18 +39,20 @@ func MakeFunctionReader(functionNamespace string,
 			// print directory keys
 			sort.Sort(resp.Node.Nodes)
 			for _, n := range resp.Node.Nodes {
+				splitStr := strings.Split(n.Key, "/")
+				functionName := splitStr[2]
 				// TODO: Get the right number of replicas
 				function := requests.Function{
-					Name:              n.Key,
+					Name:              functionName,
 					Replicas:          4,
 					Image:             "smartnic",
 					AvailableReplicas: uint64(4),
 					InvocationCount:   0,
 					Labels:            nil,
-					Annotations: 	   	 nil,
+					Annotations:       nil,
 				}
 				functions = append(functions, function)
-    		fmt.Printf("Got Function Key: %q, Value: %q\n", n.Key, n.Value)
+				fmt.Printf("Got Function Key: %q, Value: %q\n", n.Key, n.Value)
 			}
 		}
 
@@ -61,7 +64,7 @@ func MakeFunctionReader(functionNamespace string,
 }
 
 func getServiceList(functionNamespace string,
-		clientset *kubernetes.Clientset) ([]requests.Function, error) {
+	clientset *kubernetes.Clientset) ([]requests.Function, error) {
 	functions := []requests.Function{}
 
 	listOpts := metav1.ListOptions{
@@ -124,7 +127,7 @@ func readFunction(item v1beta1.Deployment) *requests.Function {
 		AvailableReplicas: uint64(item.Status.AvailableReplicas),
 		InvocationCount:   0,
 		Labels:            &labels,
-		Annotations: 	   &item.Spec.Template.Annotations,
+		Annotations:       &item.Spec.Template.Annotations,
 	}
 
 	return &function
