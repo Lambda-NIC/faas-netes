@@ -77,8 +77,9 @@ func MakeProxy(functionNamespace string, keysAPI client.KeysAPI,
 				//copyHeaders(&clientHeader, &response.Header)
 				//writeHead(service, http.StatusOK, w)
 				//io.Copy(w, "Hello")
-				log.Println("Need a proxy for SmartNICs")
-				response = generateResponse(request)
+				log.Println("Sending proxy for SmartNICs")
+				data := sendReceiveLambdaNic("20.20.21.101", 8738, "Hi")
+				response = generateResponse(request, data)
 
 			} else {
 
