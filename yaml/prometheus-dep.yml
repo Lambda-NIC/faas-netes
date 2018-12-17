@@ -10,6 +10,8 @@ spec:
       labels:
         app: prometheus
     spec:
+      nodeSelector:
+        smartnic: disabled
       containers:
       - name: prometheus
         image: prom/prometheus:v2.3.1
