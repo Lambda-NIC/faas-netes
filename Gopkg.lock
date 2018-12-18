@@ -7,11 +7,11 @@
   name = "github.com/Lambda-NIC/faas"
   packages = ["gateway/requests"]
   pruneopts = "UT"
-  revision = "0f498a7f09f933d3ec7f16a52e33ab7274372a99"
+  revision = "ca93ae10c627a13729667d57f4312a850ad9155c"
 
 [[projects]]
   branch = "master"
-  digest = "1:0f89f65aab5beed8172ae9b4f6570a1e3e073255ea0c24eadd459f5e83051e8f"
+  digest = "1:117160568dfe344023b3d96c5ad3267010946e843cd0dbf144c649e115c9c2b6"
   name = "github.com/Lambda-NIC/faas-netes"
   packages = [
     "handlers",
@@ -19,7 +19,7 @@
     "version",
   ]
   pruneopts = "UT"
-  revision = "bd4c0925d10c66320ad7cef81b024fad51f03fb5"
+  revision = "dadfb1a16769191a0828e09e753b651465cc7482"
 
 [[projects]]
   branch = "master"
@@ -303,7 +303,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:f8292d035e3f59cbcf39fecb9ca1dd24ec20ae4f8a06750609ee4b71d60d0045"
+  digest = "1:b6bbc489acd7bf1d4c6782138ffb75f46634007713795667ed7ad287fd80c070"
   name = "golang.org/x/net"
   packages = [
     "http/httpguts",
@@ -312,7 +312,7 @@
     "idna",
   ]
   pruneopts = "UT"
-  revision = "610586996380ceef02dd726cc09df7e00a3f8e56"
+  revision = "e147a9138326bc0e9d4e179541ffd8af41cff8a9"
 
 [[projects]]
   digest = "1:0c56024909189aee3364b7f21a95a27459f718aa7c199a5c111c36cfffd9eaef"
