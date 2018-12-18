@@ -157,14 +157,17 @@ func GetNumDeployments(keysAPI client.KeysAPI,
 	for _, smartNIC := range smartNICs {
 		depVal, depErr := keysAPI.Get(context.Background(),
 			CreateDepKey(smartNIC, funcName), nil)
-		log.Printf("Got %s deps for %s SmartNICS.\n", depVal.Node.Value, smartNIC)
+		log.Printf("Got key: %s. %s deps for %s SmartNICS.\n",
+			CreateDepKey(smartNIC, funcName), depVal.Node.Value, smartNIC)
 		if depErr != nil {
 			// Deployment doesn't exist
 			continue
 		} else {
-			numDep, numDepErr := strconv.ParseUint(depVal.Node.Value, 10, 64)
+			numDeps, numDepErr := strconv.ParseUint(depVal.Node.Value, 10, 64)
+			log.Printf("Parsed key: %s. %d deps for %s SmartNICS.\n",
+				CreateDepKey(smartNIC, funcName), numDeps, smartNIC)
 			if numDepErr != nil {
-				numReplicas += numDep
+				numReplicas += numDeps
 			}
 		}
 	}
