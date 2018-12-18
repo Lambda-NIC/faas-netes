@@ -105,7 +105,7 @@ func initializeEtcd(keysAPI client.KeysAPI) {
 			log.Fatal(err)
 		} else {
 			// print common key info
-			log.Printf("Added SmartNIC Server: %s to ETCD. Metadata is %q\n",
+			log.Printf("Added SmartNIC: %s to ETCD. Metadata is %q\n",
 				smartNIC, resp)
 		}
 		// Create the deployment directory for each smartnic.
@@ -116,7 +116,7 @@ func initializeEtcd(keysAPI client.KeysAPI) {
 			log.Fatal(err)
 		} else {
 			// print common key info
-			log.Printf("Added SmartNIC %s Deployments directory to ETCD."+
+			log.Printf("Added SmartNIC %s Deployments directory to ETCD. "+
 				"Metadata is %q\n", smartNIC, resp)
 		}
 	}

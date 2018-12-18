@@ -118,9 +118,8 @@ func GetSmartNICS(keysAPI client.KeysAPI) ([]string, error) {
 		log.Println("Could not retrieve SmartNICs")
 		return nil, err
 	}
-	// print directory keys
+	var smartNICs []string
 	sort.Sort(resp.Node.Nodes)
-	smartNICs := make([]string, len(resp.Node.Nodes))
 	for _, n := range resp.Node.Nodes {
 		smartNIC := strings.Split(n.Key, "/")[2]
 		log.Printf("Got SmartNIC %s\n", smartNIC)
@@ -134,10 +133,10 @@ func GetSmartNICS(keysAPI client.KeysAPI) ([]string, error) {
 func GetFunctions(keysAPI client.KeysAPI) ([]string, error) {
 	resp, err := keysAPI.Get(context.Background(), "/functions", nil)
 	if err != nil {
+		log.Println("Could not retrieve functions")
 		return nil, err
 	}
 	var functions []string
-	// print directory keys
 	sort.Sort(resp.Node.Nodes)
 	for _, n := range resp.Node.Nodes {
 		function := strings.Split(n.Key, "/")[2]
