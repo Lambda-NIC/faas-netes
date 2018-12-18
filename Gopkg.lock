@@ -11,7 +11,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:dd6d72049be7c868e356611d35de9a871ebaae349257ef5585fc32b374dae873"
+  digest = "1:c06f2637976cadb2aaf288635fca92c9657a5b6ccf1e7318b1653a736787183e"
   name = "github.com/Lambda-NIC/faas-netes"
   packages = [
     "handlers",
@@ -19,7 +19,7 @@
     "version",
   ]
   pruneopts = "UT"
-  revision = "1f39e89fa05a0aff0cacfa9328eead351dfd3959"
+  revision = "9d097807285e6fc7cb8a3b781b5b3abee7f46985"
 
 [[projects]]
   branch = "master"

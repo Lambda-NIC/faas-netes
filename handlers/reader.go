@@ -38,7 +38,7 @@ func MakeFunctionReader(functionNamespace string,
 					Name:              funcName,
 					Replicas:          numReps,
 					Image:             "smartnic",
-					AvailableReplicas: uint64(4),
+					AvailableReplicas: numReps,
 					InvocationCount:   0,
 				}
 				functions = append(functions, function)

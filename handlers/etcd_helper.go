@@ -121,11 +121,8 @@ func GetSmartNICS(keysAPI client.KeysAPI) ([]string, error) {
 	var smartNICs []string
 	sort.Sort(resp.Node.Nodes)
 	for _, n := range resp.Node.Nodes {
-		smartNIC := strings.Split(n.Key, "/")[2]
-		log.Printf("Got SmartNIC %s\n", smartNIC)
-		smartNICs = append(smartNICs, smartNIC)
+		smartNICs = append(smartNICs, strings.Split(n.Key, "/")[2])
 	}
-	log.Printf("Got SmartNICs %s\n", strings.Join(smartNICs, ", "))
 	return smartNICs, nil
 }
 
@@ -139,8 +136,7 @@ func GetFunctions(keysAPI client.KeysAPI) ([]string, error) {
 	var functions []string
 	sort.Sort(resp.Node.Nodes)
 	for _, n := range resp.Node.Nodes {
-		function := strings.Split(n.Key, "/")[2]
-		functions = append(functions, function)
+		functions = append(functions, strings.Split(n.Key, "/")[2])
 	}
 	return functions, nil
 }
@@ -154,7 +150,6 @@ func GetNumDeployments(keysAPI client.KeysAPI,
 	if err != nil {
 		return 0, err
 	}
-	log.Printf("Got %d SmartNICS.\n", len(smartNICs))
 	for _, smartNIC := range smartNICs {
 		depVal, depErr := keysAPI.Get(context.Background(),
 			CreateDepKey(smartNIC, funcName), nil)
@@ -162,15 +157,12 @@ func GetNumDeployments(keysAPI client.KeysAPI,
 			// Deployment doesn't exist
 			continue
 		} else {
-			log.Printf("Got key: %s. %s deps for %s SmartNICS.\n",
-				CreateDepKey(smartNIC, funcName), depVal.Node.Value, smartNIC)
 			numDeps, numDepErr := strconv.ParseUint(depVal.Node.Value, 10, 64)
-			log.Printf("Parsed key: %s. %d deps for %s SmartNICS.\n",
-				CreateDepKey(smartNIC, funcName), numDeps, smartNIC)
 			if numDepErr != nil {
 				numReplicas += numDeps
 			}
 		}
 	}
+	log.Printf("Got %d Replicas.\n", numReplicas)
 	return numReplicas, nil
 }
