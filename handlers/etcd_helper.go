@@ -123,8 +123,10 @@ func GetSmartNICS(keysAPI client.KeysAPI) ([]string, error) {
 	smartNICs := make([]string, len(resp.Node.Nodes))
 	for _, n := range resp.Node.Nodes {
 		smartNIC := strings.Split(n.Key, "/")[2]
+		log.Printf("Got SmartNIC %s\n", smartNIC)
 		smartNICs = append(smartNICs, smartNIC)
 	}
+	log.Printf("Got SmartNICs %s\n", strings.Join(smartNICs, ", "))
 	return smartNICs, nil
 }
 
