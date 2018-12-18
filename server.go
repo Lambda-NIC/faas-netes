@@ -144,7 +144,7 @@ func main() {
 	readConfig := types.ReadConfig{}
 	osEnv := types.OsEnv{}
 	cfg := readConfig.Read(osEnv)
-	keysAPI := CreateEtcdClient(etcdMasterIP, etcdPort)
+	keysAPI := handlers.CreateEtcdClient(etcdMasterIP, etcdPort)
 	initializeEtcd(keysAPI)
 
 	log.Printf("HTTP Read Timeout: %s\n", cfg.ReadTimeout)
