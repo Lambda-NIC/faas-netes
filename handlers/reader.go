@@ -4,13 +4,10 @@
 package handlers
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
-	"sort"
-	"strings"
 
 	"github.com/Lambda-NIC/faas/gateway/requests"
 	"go.etcd.io/etcd/client"
@@ -27,31 +24,33 @@ func MakeFunctionReader(functionNamespace string,
 	return func(w http.ResponseWriter, r *http.Request) {
 
 		functions, err := getServiceList(functionNamespace, clientset)
-		if err != nil {
-			log.Println(err)
-			w.WriteHeader(http.StatusInternalServerError)
-			w.Write([]byte(err.Error()))
-			return
-		}
 
-		resp, err := keysAPI.Get(context.Background(), "/functions", nil)
-		if err == nil {
+		// Get the
+		smartNICFuncs, smartNICerr := GetFunctions(keysAPI)
+		if smartNICerr == nil {
 			// print directory keys
-			sort.Sort(resp.Node.Nodes)
-			for _, n := range resp.Node.Nodes {
-				splitStr := strings.Split(n.Key, "/")
-				functionName := splitStr[2]
-				// TODO: Get the right number of replicas
+			for _, funcName := range smartNICFuncs {
+				numReps, numRepErr := GetNumDeployments(keysAPI, funcName)
+				if numRepErr != nil {
+					continue
+				}
 				function := requests.Function{
-					Name:              functionName,
-					Replicas:          4,
+					Name:              funcName,
+					Replicas:          numReps,
 					Image:             "smartnic",
 					AvailableReplicas: uint64(4),
 					InvocationCount:   0,
 				}
 				functions = append(functions, function)
-				fmt.Printf("Got Function Key: %q, Value: %q\n", n.Key, n.Value)
 			}
+		}
+
+		// If both types of services throw errors.
+		if err != nil && smartNICerr != nil {
+			log.Println(err)
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte(err.Error()))
+			return
 		}
 
 		functionBytes, _ := json.Marshal(functions)

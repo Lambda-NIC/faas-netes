@@ -4,9 +4,7 @@
 package handlers
 
 import (
-	"context"
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -88,22 +86,24 @@ func MakeReplicaReader(functionNamespace string,
 		var function requests.Function
 
 		// LambdaNIC: create dummy replica values.
-		// TODO: Fix this.
+		// TODO: Fix imageName.
 		if strings.Contains(functionName, "lambdanic") {
-			resp, err := keysAPI.Get(context.Background(),
-				fmt.Sprintf("/functions/%s", functionName),
-				nil)
-			if err == nil {
-				function = requests.Function{
-					Name:              functionName,
-					Replicas:          4,
-					Image:             "smartnic",
-					AvailableReplicas: uint64(4),
-					InvocationCount:   0,
-				}
-				fmt.Printf("Replica Read Key: %q, Value: %q\n",
-					resp.Node.Key,
-					resp.Node.Value)
+			// Did not find the function.
+			if !EtcdFunctionExists(keysAPI, functionName) {
+				w.WriteHeader(http.StatusNotFound)
+				return
+			}
+			numReplicas, err := GetNumDeployments(keysAPI, functionName)
+			if err != nil {
+				w.WriteHeader(http.StatusNotFound)
+				return
+			}
+			function = requests.Function{
+				Name:              functionName,
+				Replicas:          numReplicas,
+				Image:             "smartnic",
+				AvailableReplicas: uint64(4),
+				InvocationCount:   0,
 			}
 		} else {
 			function, err := getService(functionNamespace, functionName, clientset)

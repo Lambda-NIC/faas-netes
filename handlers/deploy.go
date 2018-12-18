@@ -14,11 +14,9 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
-	"time"
-	"math/rand"
-	"context"
 
 	"github.com/Lambda-NIC/faas/gateway/requests"
+	"go.etcd.io/etcd/client"
 	apiv1 "k8s.io/api/core/v1"
 	corev1 "k8s.io/api/core/v1"
 	v1beta1 "k8s.io/api/extensions/v1beta1"
@@ -26,7 +24,6 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
 	"k8s.io/client-go/kubernetes"
-	"go.etcd.io/etcd/client"
 )
 
 // watchdogPort for the OpenFaaS function watchdog
@@ -66,10 +63,9 @@ type DeployHandlerConfig struct {
 
 // MakeDeployHandler creates a handler to create new functions in the cluster
 func MakeDeployHandler(functionNamespace string,
-											 keysAPI client.KeysAPI,
-											 smartNICs *[]string,
-											 clientset *kubernetes.Clientset,
-											 config *DeployHandlerConfig) http.HandlerFunc {
+	keysAPI client.KeysAPI,
+	clientset *kubernetes.Clientset,
+	config *DeployHandlerConfig) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		defer r.Body.Close()
 
@@ -91,45 +87,18 @@ func MakeDeployHandler(functionNamespace string,
 		// LambdaNIC: Deployment scheme for lambdanic
 		if strings.Contains(request.Service, "lambdanic") {
 			// Check if this service already exists
-			var jobID string = fmt.Sprintf("/functions/%s", request.Service)
-			_, err = keysAPI.Get(context.Background(), jobID, nil)
-			if err == nil {
+			if EtcdFunctionExists(keysAPI, request.Service) {
 				w.WriteHeader(http.StatusBadRequest)
 				w.Write([]byte(request.Service + " already exists"))
 				return
 			}
-			if !client.IsKeyNotFound(err) {
-				w.WriteHeader(http.StatusBadRequest)
-				w.Write([]byte("Error Creating Service:" + request.Service))
-				log.Println("Error: " + err.Error())
-				return
-			}
 			// Assign a uid to the job
-			uid := fmt.Sprintf("%d", time.Now().Nanosecond())
-			etcdResp, etcdErr := keysAPI.Set(context.Background(), jobID, uid, nil)
-			if etcdErr != nil {
+			err = EtcdFunctionCreate(keysAPI, request.Service)
+			if err != nil {
 				w.WriteHeader(http.StatusBadRequest)
 				w.Write([]byte("Error Creating Service:" + request.Service))
 				return
 			}
-			log.Printf("Added uid: %s to job: %s to ETCD. Metadata is %q\n",
-								 uid, request.Service, etcdResp)
-			// Randomly assign service to a smartnic
-			randIdx := rand.Intn(len(*smartNICs))
-			var depKey string = fmt.Sprintf("/deployments/smartnic%d/%s",
-																			 randIdx,
-																			 request.Service)
-			etcdResp, etcdErr = keysAPI.Set(context.Background(), depKey, "1", nil)
-			if etcdErr != nil {
-				w.WriteHeader(http.StatusBadRequest)
-				w.Write([]byte("Error Creating Service:" + request.Service))
-				return
-			}
-			log.Printf("Added 1 Dep: %s to ECTD. Metadata is %q\n",
-								 depKey, etcdResp)
-			log.Println("Created SmartNIC service - " + request.Service + " at " +
-									(*smartNICs)[randIdx])
-			log.Println(string(body))
 		} else {
 			existingSecrets, err :=
 				getSecrets(clientset, functionNamespace, request.Secrets)
@@ -165,21 +134,21 @@ func MakeDeployHandler(functionNamespace string,
 			_, err = service.Create(serviceSpec)
 
 			if err != nil {
-			  log.Println(err)
+				log.Println(err)
 				w.WriteHeader(http.StatusInternalServerError)
 				w.Write([]byte(err.Error()))
 				return
 			}
 			log.Println("Created service - " + request.Service)
 			log.Println(string(body))
-	  }
+		}
 		w.WriteHeader(http.StatusAccepted)
 	}
 }
 
 func makeDeploymentSpec(request requests.CreateFunctionRequest,
-		existingSecrets map[string]*apiv1.Secret,
-		config *DeployHandlerConfig) (*v1beta1.Deployment, error) {
+	existingSecrets map[string]*apiv1.Secret,
+	config *DeployHandlerConfig) (*v1beta1.Deployment, error) {
 	envVars := buildEnvVars(&request)
 	var handler apiv1.Handler
 

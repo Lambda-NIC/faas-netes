@@ -44,30 +44,7 @@ func createEtcdClient() client.KeysAPI {
 	return kapi
 }
 
-func main() {
-	// creates the in-cluster config
-	config, err := rest.InClusterConfig()
-	if err != nil {
-		panic(err.Error())
-	}
-
-	functionNamespace := "default"
-
-	if namespace, exists := os.LookupEnv("function_namespace"); exists {
-		functionNamespace = namespace
-	}
-
-	// creates the clientset
-	clientset, err := kubernetes.NewForConfig(config)
-	if err != nil {
-		panic(err.Error())
-	}
-
-	readConfig := types.ReadConfig{}
-	osEnv := types.OsEnv{}
-	cfg := readConfig.Read(osEnv)
-	keysAPI := createEtcdClient()
-
+func initializeEtcd(keysAPI client.KeysAPI) {
 	opts := client.SetOptions{Dir: true}
 	resp, err := keysAPI.Set(context.Background(),
 		"/smartnics",
@@ -136,9 +113,10 @@ func main() {
 			resp)
 	}
 
-	for i, smartNIC := range smartNICs {
+	for _, smartNIC := range smartNICs {
+		// Create each smartnic entry.
 		resp, err = keysAPI.Set(context.Background(),
-			fmt.Sprintf("/smartnics/%d", i),
+			fmt.Sprintf("/smartnics/%s", smartNIC),
 			smartNIC, nil)
 		if err != nil {
 			log.Fatal(err)
@@ -147,27 +125,44 @@ func main() {
 			log.Printf("Added SmartNIC Server: %s to ETCD. Metadata is %q\n",
 				smartNIC, resp)
 		}
+		// Create the deployment directory for each smartnic.
 		resp, err = keysAPI.Set(context.Background(),
-			fmt.Sprintf("/deployments/smartnic%d", i),
+			fmt.Sprintf("/deployments/smartnic/%s", smartNIC),
 			"", &opts)
 		if err != nil {
 			log.Fatal(err)
 		} else {
 			// print common key info
-			log.Printf("Added SmartNIC %d Deployments directory to ETCD."+
-				"Metadata is %q\n",
-				i, resp)
+			log.Printf("Added SmartNIC %s Deployments directory to ETCD."+
+				"Metadata is %q\n", smartNIC, resp)
 		}
 	}
-	_, err = keysAPI.Set(context.Background(),
-		"numServers",
-		fmt.Sprintf("%d", len(smartNICs)),
-		nil)
+}
+
+func main() {
+	// creates the in-cluster config
+	config, err := rest.InClusterConfig()
 	if err != nil {
-		log.Fatal(err)
-	} else {
-		log.Printf("Set the number of SmartNICs as %d in ETCD", len(smartNICs))
+		panic(err.Error())
 	}
+
+	functionNamespace := "default"
+
+	if namespace, exists := os.LookupEnv("function_namespace"); exists {
+		functionNamespace = namespace
+	}
+
+	// creates the clientset
+	clientset, err := kubernetes.NewForConfig(config)
+	if err != nil {
+		panic(err.Error())
+	}
+
+	readConfig := types.ReadConfig{}
+	osEnv := types.OsEnv{}
+	cfg := readConfig.Read(osEnv)
+	keysAPI := createEtcdClient()
+	initializeEtcd(keysAPI)
 
 	log.Printf("HTTP Read Timeout: %s\n", cfg.ReadTimeout)
 	log.Printf("HTTP Write Timeout: %s\n", cfg.WriteTimeout)

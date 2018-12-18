@@ -4,13 +4,10 @@
 package handlers
 
 import (
-	"context"
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
-	"strconv"
 	"strings"
 
 	"github.com/Lambda-NIC/faas/gateway/requests"
@@ -45,46 +42,22 @@ func MakeDeleteHandler(functionNamespace string,
 		// LambdaNIC: Delete scheme for lambdanic
 		if strings.Contains(request.FunctionName, "lambdanic") {
 			log.Printf("Got request to delete: %s", request.FunctionName)
-
-			node, err := keysAPI.Get(context.Background(), "numServers", nil)
-			if err != nil {
+			// Check if this service exists
+			if !EtcdFunctionExists(keysAPI, request.FunctionName) {
 				w.WriteHeader(http.StatusBadRequest)
 				w.Write([]byte("Error Deleting Function:" + request.FunctionName))
-				log.Println("No numServers key: " + err.Error())
+				log.Println("Error: " + err.Error())
 				return
 			}
-			numServers, err := strconv.Atoi(node.Node.Value)
-			if err != nil {
-				log.Fatal("Invalid numServer value in etcd db: " + node.Node.Value)
-			}
-			log.Printf("%d servers available\n", numServers)
-
-			// Check if this service exists
-			var jobID string = fmt.Sprintf("/functions/%s", request.FunctionName)
-			log.Printf("Deleting function with key: %s\n", jobID)
-			_, err = keysAPI.Delete(context.Background(), jobID, nil)
+			// Delete the deployments and the function
+			err = EtcdFunctionDelete(keysAPI, request.FunctionName)
 			if err != nil {
 				w.WriteHeader(http.StatusBadRequest)
 				w.Write([]byte("Error Deleting Function:" + request.FunctionName))
 				log.Println("Error: " + err.Error())
 				return
 			}
-			log.Printf("Deleted Function: %s\n", request.FunctionName)
-
-			for i := 0; i < numServers; i++ {
-				log.Println("Deleting deployment.")
-				var depKey string = fmt.Sprintf("/deployments/smartnic%d/%s",
-					i,
-					request.FunctionName)
-				_, err = keysAPI.Delete(context.Background(), depKey, nil)
-				if err != nil {
-					log.Printf("Couldn't find deployment at server %d\n", i)
-				} else {
-					log.Printf("Deleted %s in server %d\n", request.FunctionName, i)
-				}
-			}
 			log.Println("Deleted SmartNIC service - " + request.FunctionName)
-			log.Println(string(body))
 		} else {
 			getOpts := metav1.GetOptions{}
 
@@ -127,7 +100,9 @@ func isFunction(deployment *v1beta1.Deployment) bool {
 	return false
 }
 
-func deleteFunction(functionNamespace string, clientset *kubernetes.Clientset, request requests.DeleteFunctionRequest, w http.ResponseWriter) {
+func deleteFunction(functionNamespace string, clientset *kubernetes.Clientset,
+	request requests.DeleteFunctionRequest, w http.ResponseWriter) {
+
 	foregroundPolicy := metav1.DeletePropagationForeground
 	opts := &metav1.DeleteOptions{PropagationPolicy: &foregroundPolicy}
 
