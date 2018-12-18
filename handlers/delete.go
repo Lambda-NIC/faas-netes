@@ -21,7 +21,6 @@ import (
 // MakeDeleteHandler delete a function
 func MakeDeleteHandler(functionNamespace string,
 	keysAPI client.KeysAPI,
-	smartNICs *[]string,
 	clientset *kubernetes.Clientset) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		defer r.Body.Close()

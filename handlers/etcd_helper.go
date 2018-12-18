@@ -33,7 +33,7 @@ func EtcdFunctionCreate(keysAPI client.KeysAPI,
 	if err != nil {
 		return err
 	}
-	log.Printf("Added func: %s id: %d to ETCD. Metadata: %q\n",
+	log.Printf("Added func: %s id: %s to ETCD. Metadata: %q\n",
 		funcName, uid, resp)
 	smartNICs, err := GetSmartNICS(keysAPI)
 	if err != nil {
