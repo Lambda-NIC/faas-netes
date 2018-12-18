@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"time"
 
 	"github.com/Lambda-NIC/faas-netes/handlers"
 	"github.com/Lambda-NIC/faas-netes/types"
@@ -27,22 +26,6 @@ const etcdPort string = "2379"
 // LambdaNIC: List of SmartNICs to use and how many deployments are there.
 var smartNICs = []string{"20.20.20.101", "20.20.20.102",
 	"20.20.20.103", "20.20.20.104"}
-
-func createEtcdClient() client.KeysAPI {
-	cfg := client.Config{
-		Endpoints: []string{fmt.Sprintf("http://%s:%s", etcdMasterIP, etcdPort)},
-		Transport: client.DefaultTransport,
-		// set timeout per request to fail fast when
-		// the target endpoint is unavailable
-		HeaderTimeoutPerRequest: time.Second,
-	}
-	c, err := client.New(cfg)
-	if err != nil {
-		log.Fatal("Could not connect to ETCD: " + err.Error())
-	}
-	kapi := client.NewKeysAPI(c)
-	return kapi
-}
 
 func initializeEtcd(keysAPI client.KeysAPI) {
 	opts := client.SetOptions{Dir: true}
@@ -161,7 +144,7 @@ func main() {
 	readConfig := types.ReadConfig{}
 	osEnv := types.OsEnv{}
 	cfg := readConfig.Read(osEnv)
-	keysAPI := createEtcdClient()
+	keysAPI := CreateEtcdClient(etcdMasterIP, etcdPort)
 	initializeEtcd(keysAPI)
 
 	log.Printf("HTTP Read Timeout: %s\n", cfg.ReadTimeout)

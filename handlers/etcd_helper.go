@@ -13,6 +13,23 @@ import (
 	"go.etcd.io/etcd/client"
 )
 
+// CreateEtcdClient creates a client for ETCD deployment
+func CreateEtcdClient(etcdMasterIP string, etcdPort string) client.KeysAPI {
+	cfg := client.Config{
+		Endpoints: []string{fmt.Sprintf("http://%s:%s", etcdMasterIP, etcdPort)},
+		Transport: client.DefaultTransport,
+		// set timeout per request to fail fast when
+		// the target endpoint is unavailable
+		HeaderTimeoutPerRequest: time.Second,
+	}
+	c, err := client.New(cfg)
+	if err != nil {
+		log.Fatal("Could not connect to ETCD: " + err.Error())
+	}
+	kapi := client.NewKeysAPI(c)
+	return kapi
+}
+
 // CreateDepKey creates a key for deployment
 func CreateDepKey(smartNIC string, funcName string) string {
 	return fmt.Sprintf("/deployments/smartnic/%s/%s", smartNIC,
