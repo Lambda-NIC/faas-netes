@@ -1,5 +1,5 @@
 #!/bin/sh
 
-dep ensure
+dep ensure -update
 make build
 make push
