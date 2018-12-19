@@ -89,7 +89,6 @@ func UpdateReplicas(keysAPI client.KeysAPI,
 	// TODO add max deployments
 	numDepsPerNIC := int(numReplicas) / len(smartNICs)
 	remainder := int(numReplicas) % len(smartNICs)
-	log.Printf("Updating %d %d\n", numDepsPerNIC, remainder)
 	for i, smartNIC := range smartNICs {
 		depKey := CreateDepKey(smartNIC, funcName)
 		var err error

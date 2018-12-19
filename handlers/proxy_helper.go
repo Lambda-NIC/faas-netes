@@ -8,52 +8,37 @@ import (
 	"log"
 	"net"
 	"net/http"
-	"sync"
+	"time"
 )
 
-const udpPacketSize = 10
-
 func sendReceiveLambdaNic(addrStr string, port int, data string) string {
-	var wg sync.WaitGroup
-	var inbound string
-	localUDPAddr := net.UDPAddr{IP: net.ParseIP("30.30.30.105"), Port: 2222}
 	remoteUDPAddr := net.UDPAddr{IP: net.ParseIP(addrStr), Port: port}
 
-	conn, err := net.ListenUDP("udp4", &localUDPAddr)
+	//log.Printf("Connecting to server:%s \n", remoteUDPAddr.String())
+	conn, err := net.DialUDP("udp4", nil, &remoteUDPAddr)
 	if err != nil {
-		log.Printf("Error: UDP conn error: %v", err)
+		log.Printf("Error: UDP conn error: %v\n", err)
 		return ""
 	}
 	defer conn.Close()
 
-	wg.Add(2)
-	go func() {
-		defer wg.Done()
-		_, err := conn.WriteToUDP([]byte(data), &remoteUDPAddr)
-		if err != nil {
-			log.Printf("Error: UDP write error: %v", err)
-		} else {
-			log.Printf("Wrote: %s to %s:%d", data, addrStr, port)
-		}
-	}()
-
-	go func() {
-		defer wg.Done()
-		b := make([]byte, udpPacketSize)
-		for {
-			n, _, err := conn.ReadFromUDP(b)
-			if err != nil {
-				log.Printf("Error: UDP read error: %v", err)
-				continue
-			}
-			b2 := make([]byte, udpPacketSize)
-			copy(b2, b)
-			inbound = string(b2[:n])
-			return
-		}
-	}()
-	wg.Wait()
-	return inbound
+	// send to socket
+	//log.Printf("Sending to server:%s \n", remoteUDPAddr.String())
+	_, err = conn.Write([]byte(data))
+	if err != nil {
+		log.Printf("Error in sending to server\n")
+		return ""
+	}
+	//log.Printf("Sent %d bytes to server:%s\n", n, remoteUDPAddr.String())
+	conn.SetReadDeadline(time.Now().Add(2 * time.Second))
+	msg := make([]byte, 32)
+	n, err := conn.Read(msg)
+	if err != nil {
+		log.Printf("Error in receiving from server\n")
+		return ""
+	}
+	//fmt.Printf("Message from server: %d bytes: %s\n", n, string(msg[:n]))
+	return string(msg[:n])
 }
 
 func generateResponse(req *http.Request, body string) *http.Response {

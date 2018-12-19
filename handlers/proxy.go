@@ -80,11 +80,8 @@ func MakeProxy(functionNamespace string, keysAPI client.KeysAPI,
 				log.Println("Sending proxy for SmartNICs")
 				data := sendReceiveLambdaNic("20.20.21.101", 8738, "Hi")
 				response = generateResponse(request, data)
-
 			} else {
-
 				response, err = proxyClient.Do(request)
-
 				if err != nil {
 					log.Println(err.Error())
 					writeHead(service, http.StatusInternalServerError, w)
