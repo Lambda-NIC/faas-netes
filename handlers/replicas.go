@@ -22,7 +22,6 @@ import (
 func MakeReplicaUpdater(functionNamespace string, keysAPI client.KeysAPI,
 	clientset *kubernetes.Clientset) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		log.Println("Update replicas")
 
 		vars := mux.Vars(r)
 		functionName := vars["name"]
@@ -86,8 +85,6 @@ func MakeReplicaReader(functionNamespace string,
 	keysAPI client.KeysAPI,
 	clientset *kubernetes.Clientset) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		log.Println("Read replicas")
-
 		vars := mux.Vars(r)
 		functionName := vars["name"]
 		var function requests.Function

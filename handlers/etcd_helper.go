@@ -87,17 +87,18 @@ func UpdateReplicas(keysAPI client.KeysAPI,
 
 	// Distribute load equally to all smartnics.
 	// TODO add max deployments
-	numDepsPerNIC := numReplicas / uint64(len(smartNICs))
-	remainder := numReplicas % uint64(len(smartNICs))
+	numDepsPerNIC := int(numReplicas) / len(smartNICs)
+	remainder := int(numReplicas) % len(smartNICs)
+	log.Printf("Updating %d %d\n", numDepsPerNIC, remainder)
 	for i, smartNIC := range smartNICs {
 		depKey := CreateDepKey(smartNIC, funcName)
 		var err error
-		if uint64(i) < remainder {
+		if i < remainder {
 			_, err = keysAPI.Set(context.Background(), depKey,
-				strconv.FormatUint(numDepsPerNIC+1, 64), nil)
+				strconv.Itoa(numDepsPerNIC+1), nil)
 		} else {
 			_, err = keysAPI.Set(context.Background(), depKey,
-				strconv.FormatUint(numDepsPerNIC, 64), nil)
+				strconv.Itoa(numDepsPerNIC), nil)
 		}
 		if err != nil {
 			return err
