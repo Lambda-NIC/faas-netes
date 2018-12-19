@@ -42,6 +42,13 @@ func MakeReplicaUpdater(functionNamespace string, keysAPI client.KeysAPI,
 		}
 		if strings.Contains(functionName, "lambdanic") {
 			log.Printf("Updating replica for %s\n", functionName)
+			err := UpdateReplicas(keysAPI, req.Replicas, functionName)
+			if err != nil {
+				w.WriteHeader(http.StatusInternalServerError)
+				w.Write([]byte("Unable to update function deployment " + functionName))
+				log.Println(err)
+				return
+			}
 		} else {
 			options := metav1.GetOptions{
 				TypeMeta: metav1.TypeMeta{
@@ -93,16 +100,16 @@ func MakeReplicaReader(functionNamespace string,
 				w.WriteHeader(http.StatusNotFound)
 				return
 			}
-			numReplicas, err := GetNumDeployments(keysAPI, functionName)
+			numReps, err := GetNumDeployments(keysAPI, functionName)
 			if err != nil {
 				w.WriteHeader(http.StatusNotFound)
 				return
 			}
 			function = requests.Function{
 				Name:              functionName,
-				Replicas:          numReplicas,
+				Replicas:          numReps,
 				Image:             "smartnic",
-				AvailableReplicas: uint64(4),
+				AvailableReplicas: numReps,
 				InvocationCount:   0,
 			}
 		} else {

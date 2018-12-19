@@ -77,6 +77,36 @@ func EtcdFunctionCreate(keysAPI client.KeysAPI,
 	return nil
 }
 
+// UpdateReplicas updates the number of replicas of a function.
+func UpdateReplicas(keysAPI client.KeysAPI,
+	numReplicas uint64, funcName string) error {
+	smartNICs, err := GetSmartNICS(keysAPI)
+	if err != nil {
+		return err
+	}
+
+	// Distribute load equally to all smartnics.
+	// TODO add max deployments
+	numDepsPerNIC := numReplicas / uint64(len(smartNICs))
+	remainder := numReplicas % uint64(len(smartNICs))
+	for i, smartNIC := range smartNICs {
+		depKey := CreateDepKey(smartNIC, funcName)
+		var err error
+		if uint64(i) < remainder {
+			_, err = keysAPI.Set(context.Background(), depKey,
+				strconv.FormatUint(numDepsPerNIC+1, 64), nil)
+		} else {
+			_, err = keysAPI.Set(context.Background(), depKey,
+				strconv.FormatUint(numDepsPerNIC, 64), nil)
+		}
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 // EtcdFunctionDelete deletes the function with function name
 func EtcdFunctionDelete(keysAPI client.KeysAPI, funcName string) error {
 	smartNICs, err := GetSmartNICS(keysAPI)
@@ -158,11 +188,10 @@ func GetNumDeployments(keysAPI client.KeysAPI,
 			continue
 		} else {
 			numDeps, numDepErr := strconv.ParseUint(depVal.Node.Value, 10, 64)
-			if numDepErr != nil {
+			if numDepErr == nil {
 				numReplicas += numDeps
 			}
 		}
 	}
-	log.Printf("Got %d Replicas.\n", numReplicas)
 	return numReplicas, nil
 }
