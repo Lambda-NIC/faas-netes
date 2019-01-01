@@ -24,8 +24,8 @@ const etcdMasterIP string = "127.0.0.1"
 const etcdPort string = "2379"
 
 // LambdaNIC: List of SmartNICs to use and how many deployments are there.
-var smartNICs = []string{"20.20.21.101", "20.20.22.101",
-	"20.20.23.101", "20.20.24.101"}
+var smartNICs = []string{"10.10.101.101", "10.10.102.101",
+	"10.10.103.101", "10.10.104.101"}
 
 func initializeEtcd(keysAPI client.KeysAPI) {
 	opts := client.SetOptions{Dir: true}
