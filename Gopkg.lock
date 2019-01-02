@@ -7,11 +7,11 @@
   name = "github.com/Lambda-NIC/faas"
   packages = ["gateway/requests"]
   pruneopts = "UT"
-  revision = "0f84a18eba6ecadc8ea9f77f00800d5f7a69409a"
+  revision = "87b2257a72ce6fd05175ecb93a384a297b3b961a"
 
 [[projects]]
   branch = "master"
-  digest = "1:43cac36669658c71623b1a9a98c9dde06685da5e1e807907a1a1caaa5cbe71a8"
+  digest = "1:9e052cff87baefce7a9219a0c1e87e770a6d544d4cf827cc3d57068573d94fb8"
   name = "github.com/Lambda-NIC/faas-netes"
   packages = [
     "handlers",
@@ -19,7 +19,7 @@
     "version",
   ]
   pruneopts = "UT"
-  revision = "7dd2f216f9c607475351b08be3b71e01929c018e"
+  revision = "646218b99c9dec20de29eed99042bdc7f3c9d770"
 
 [[projects]]
   branch = "master"

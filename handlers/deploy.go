@@ -74,7 +74,7 @@ func MakeDeployHandler(functionNamespace string,
 		request := requests.CreateFunctionRequest{}
 
 		// Make sure the deployment only occurs at nodes with smartnics
-		append(request.Constraints, "smartnic=enabled")
+		request.Constraints = append(request.Constraints, "smartnic=enabled")
 
 		err := json.Unmarshal(body, &request)
 		if err != nil {
