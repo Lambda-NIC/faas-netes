@@ -6,19 +6,19 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"time"
 	"strings"
+	"time"
 
 	"github.com/Lambda-NIC/faas/gateway/requests"
+	"go.etcd.io/etcd/client"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
-	"go.etcd.io/etcd/client"
 )
 
 // MakeUpdateHandler update specified function
 func MakeUpdateHandler(functionNamespace string,
-											 keysAPI client.KeysAPI,
-											 clientset *kubernetes.Clientset) http.HandlerFunc {
+	keysAPI client.KeysAPI,
+	clientset *kubernetes.Clientset) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
 		defer r.Body.Close()
@@ -26,6 +26,10 @@ func MakeUpdateHandler(functionNamespace string,
 		body, _ := ioutil.ReadAll(r.Body)
 
 		request := requests.CreateFunctionRequest{}
+
+		// Make sure the deployment only occurs at nodes with smartnics
+		request.Constraints = append(request.Constraints, "smartnic=enabled")
+
 		err := json.Unmarshal(body, &request)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
@@ -39,14 +43,14 @@ func MakeUpdateHandler(functionNamespace string,
 		} else {
 			annotations := buildAnnotations(request)
 			if status, err := updateDeploymentSpec(functionNamespace,
-																						 clientset, request,
-																						 annotations); err != nil {
+				clientset, request,
+				annotations); err != nil {
 				w.WriteHeader(status)
 				w.Write([]byte(err.Error()))
 			}
 
 			if status, err := updateService(functionNamespace, clientset,
-																			request, annotations); err != nil {
+				request, annotations); err != nil {
 				w.WriteHeader(status)
 				w.Write([]byte(err.Error()))
 			}
