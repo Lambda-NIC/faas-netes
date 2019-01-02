@@ -72,6 +72,10 @@ func MakeDeployHandler(functionNamespace string,
 		body, _ := ioutil.ReadAll(r.Body)
 
 		request := requests.CreateFunctionRequest{}
+
+		// Make sure the deployment only occurs at nodes with smartnics
+		append(request.Constraints, "smartnic=enabled")
+
 		err := json.Unmarshal(body, &request)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)

@@ -7,7 +7,7 @@
   name = "github.com/Lambda-NIC/faas"
   packages = ["gateway/requests"]
   pruneopts = "UT"
-  revision = "e717c0eaee98b14c501b5414f3fd03ff30f1149e"
+  revision = "0f84a18eba6ecadc8ea9f77f00800d5f7a69409a"
 
 [[projects]]
   branch = "master"
@@ -19,7 +19,7 @@
     "version",
   ]
   pruneopts = "UT"
-  revision = "4350653f19eb81d00e9e7191bef8d646b5092905"
+  revision = "7dd2f216f9c607475351b08be3b71e01929c018e"
 
 [[projects]]
   branch = "master"
