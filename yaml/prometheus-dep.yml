@@ -5,7 +5,6 @@ metadata:
   namespace: openfaas
 spec:
   replicas: 1
-  externalUrl: http://127.0.0.1:8001/api/v1/namespaces/openfaas/services/http:prometheus:/
   template:
     metadata:
       labels:
@@ -19,6 +18,8 @@ spec:
         command:
           - "prometheus"
           - "--config.file=/etc/prometheus/prometheus.yml"
+          - "--web.external-url=http://172.24.90.32:8001/api/v1/namespaces/openfaas/services/http:prometheus:/proxy/"
+          - "--web.route-prefix=/"
         imagePullPolicy: Always
         ports:
         - containerPort: 9090
