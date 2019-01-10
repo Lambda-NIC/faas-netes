@@ -19,7 +19,7 @@
     "version",
   ]
   pruneopts = "UT"
-  revision = "d414326b10535e8c3dfdd488a8d35bd82c604a37"
+  revision = "f5118c62681c3c2d08c9b9b534a254bf34e5bbfc"
 
 [[projects]]
   branch = "master"

@@ -5,7 +5,7 @@ metadata:
   namespace: openfaas
 spec:
   replicas: 1
-  externalUrl: http://127.0.0.1:8001/api/v1/namespaces/openfaas/services/http:prometheus:/proxy/
+  externalUrl: http://127.0.0.1:8001/api/v1/namespaces/openfaas/services/http:prometheus:/
   template:
     metadata:
       labels:
