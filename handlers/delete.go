@@ -39,7 +39,8 @@ func MakeDeleteHandler(functionNamespace string,
 		}
 
 		// LambdaNIC: Delete scheme for lambdanic
-		if strings.Contains(request.FunctionName, "lambdanic") {
+		if strings.Contains(request.FunctionName, "lambdanic") ||
+			strings.Contains(request.FunctionName, "baremetal") {
 			log.Printf("Got request to delete: %s", request.FunctionName)
 			// Check if this service exists
 			if !EtcdFunctionExists(keysAPI, request.FunctionName) {

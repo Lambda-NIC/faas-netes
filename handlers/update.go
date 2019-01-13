@@ -37,7 +37,8 @@ func MakeUpdateHandler(functionNamespace string,
 		}
 
 		// LambdaNIC: Update a function
-		if strings.Contains(request.Service, "lambdanic") {
+		if strings.Contains(request.Service, "lambdanic") ||
+			strings.Contains(request.Service, "baremetal") {
 			// TODO: Need to do this.
 			w.Write([]byte("Updated!"))
 		} else {

@@ -39,7 +39,8 @@ func MakeReplicaUpdater(functionNamespace string, keysAPI client.KeysAPI,
 				return
 			}
 		}
-		if strings.Contains(functionName, "lambdanic") {
+		if strings.Contains(functionName, "lambdanic") ||
+			strings.Contains(functionName, "baremetal") {
 			log.Printf("Updating replica for %s\n", functionName)
 			err := UpdateReplicas(keysAPI, req.Replicas, functionName)
 			if err != nil {

@@ -168,7 +168,8 @@ func main() {
 	bootstrapHandlers := bootTypes.FaaSHandlers{
 		FunctionProxy: handlers.MakeProxy(functionNamespace,
 			keysAPI,
-			cfg.ReadTimeout),
+			cfg.ReadTimeout,
+			smartNICs),
 		DeleteHandler: handlers.MakeDeleteHandler(functionNamespace,
 			keysAPI,
 			clientset),

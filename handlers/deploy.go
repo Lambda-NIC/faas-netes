@@ -89,7 +89,8 @@ func MakeDeployHandler(functionNamespace string,
 		}
 
 		// LambdaNIC: Deployment scheme for lambdanic
-		if strings.Contains(request.Service, "lambdanic") {
+		if strings.Contains(request.Service, "lambdanic") ||
+			strings.Contains(request.Service, "baremetal") {
 			// Check if this service already exists
 			if EtcdFunctionExists(keysAPI, request.Service) {
 				w.WriteHeader(http.StatusBadRequest)

@@ -4,6 +4,7 @@ package handlers
 
 import (
 	"bytes"
+	"encoding/binary"
 	"io/ioutil"
 	"log"
 	"net"
@@ -11,7 +12,8 @@ import (
 	"time"
 )
 
-func sendReceiveLambdaNic(addrStr string, port int, data string) string {
+func sendReceiveLambdaNic(addrStr string,
+	port int, jobID int, data string) string {
 	remoteUDPAddr := net.UDPAddr{IP: net.ParseIP(addrStr), Port: port}
 
 	//log.Printf("Connecting to server:%s \n", remoteUDPAddr.String())
@@ -24,7 +26,10 @@ func sendReceiveLambdaNic(addrStr string, port int, data string) string {
 
 	// send to socket
 	//log.Printf("Sending to server:%s \n", remoteUDPAddr.String())
-	_, err = conn.Write([]byte(data))
+	bs := make([]byte, 4)
+	binary.BigEndian.PutUint32(bs, uint32(jobID))
+	dataBytes := append(bs, []byte(data)...)
+	_, err = conn.Write(dataBytes)
 	if err != nil {
 		log.Printf("Error in sending to server\n")
 		return ""

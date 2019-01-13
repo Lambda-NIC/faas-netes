@@ -7,7 +7,9 @@ import (
 	"bytes"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"log"
+	"math/rand"
 	"net"
 	"net/http"
 	"strconv"
@@ -21,7 +23,8 @@ import (
 
 // MakeProxy creates a proxy for HTTP web requests which can be routed to a function.
 func MakeProxy(functionNamespace string, keysAPI client.KeysAPI,
-	timeout time.Duration) http.HandlerFunc {
+	timeout time.Duration,
+	smartNICs []string) http.HandlerFunc {
 	proxyClient := http.Client{
 		Transport: &http.Transport{
 			Proxy: http.ProxyFromEnvironment,
@@ -71,15 +74,36 @@ func MakeProxy(functionNamespace string, keysAPI client.KeysAPI,
 			var err error
 			clientHeader := w.Header()
 
-			if strings.Contains(service, "lambdanic") {
-				// TODO: Send to smartNIC and wait or let it send response back?
-				//clientHeader := w.Header()
-				//copyHeaders(&clientHeader, &response.Header)
-				//writeHead(service, http.StatusOK, w)
-				//io.Copy(w, "Hello")
-				log.Println("Sending proxy for SmartNICs")
-				data := sendReceiveLambdaNic("20.20.21.101", 8738, "Hi")
-				response = generateResponse(request, data)
+			isLambdaNIC := strings.Contains(service, "lambdanic")
+			isBareMetal := strings.Contains(service, "baremetal")
+			if isLambdaNIC || isBareMetal {
+				body, readErr := ioutil.ReadAll(r.Body)
+				if readErr != nil {
+					log.Printf("Error reading body: %v\n", err)
+				} else {
+					bodyStr := string(body)
+					jobID, jobIDErr := strconv.Atoi(bodyStr)
+					if jobIDErr != nil {
+						log.Printf("Error paring job ID: %v\n", err)
+					}
+					// TODO: Send to smartNIC and wait or let it send response back?
+					//clientHeader := w.Header()
+					//copyHeaders(&clientHeader, &response.Header)
+					//writeHead(service, http.StatusOK, w)
+					//io.Copy(w, "Hello")
+					log.Println("Sending proxy for SmartNICs")
+					randIdx := rand.Intn(len(smartNICs))
+					addrStr := smartNICs[randIdx]
+					result := ""
+					if isLambdaNIC {
+						result = sendReceiveLambdaNic(addrStr, 4369, jobID,
+							"                ")
+					} else if isBareMetal {
+						result = sendReceiveLambdaNic(addrStr, 10000, jobID,
+							"                ")
+					}
+					response = generateResponse(request, result)
+				}
 			} else {
 				response, err = proxyClient.Do(request)
 				if err != nil {
